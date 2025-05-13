@@ -54,19 +54,47 @@ export default function Home() {
     try {
       setIsLoading(true);
       const data = await fetchMusicLibrary();
-      setSongs(data);
-      setError(null);
+      console.log('Fetched music library:', data);
+      
+      // Check if we got valid data
+      if (data && Array.isArray(data) && data.length > 0) {
+        setSongs(data);
+        setError(null);
+        return data;
+      } else {
+        console.error('API returned empty or invalid data');
+        setSongs([]);
+        setError('No songs available. The API returned empty data.');
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching songs:', error);
-      setError('Failed to load music library. Please try again later.');
+      setSongs([]);
+      setError(`Failed to load music library: ${error.message}. Please try again later.`);
+      return [];
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Load songs on component mount
   useEffect(() => {
     fetchSongs();
   }, []);
+
+  // Debug songs state changes
+  useEffect(() => {
+    console.log('Songs state updated:', songs);
+  }, [songs]);
+
+  useEffect(() => {
+    if (songs.length > 0) {
+      setCurrentSongIndex(0);
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(songs[0].duration);
+    }
+  }, [songs, setCurrentSongIndex, setIsPlaying, setCurrentTime, setDuration]);
 
   const handleRetry = () => {
     setError(null);
