@@ -7,6 +7,7 @@ import TempoSlider from '../components/TempoSlider';
 import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import TelegramUser from '../components/TelegramUser';
 
 export default function Home() {
   // Initialize with empty array - songs will be fetched from API
@@ -121,31 +122,47 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner text="Loading music library..." />
+      <div className="container relative">
+        {/* Telegram User component will show in top right if in Telegram Mini App */}
+        <TelegramUser />
+        
+        <div className="flex items-center justify-center h-screen">
+          <LoadingSpinner text="Loading music library..." />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen p-4">
-        <ErrorMessage message={error} onRetry={handleRetry} className="max-w-md" />
+      <div className="container relative">
+        {/* Telegram User component will show in top right if in Telegram Mini App */}
+        <TelegramUser />
+        
+        <div className="flex items-center justify-center h-screen p-4">
+          <ErrorMessage message={error} onRetry={handleRetry} className="max-w-md" />
+        </div>
       </div>
     );
   }
 
   if (songs.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">No songs available</p>
-          <button
-            onClick={handleRetry}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Retry
-          </button>
+      <div className="container relative">
+        {/* Telegram User component will show in top right if in Telegram Mini App */}
+        <TelegramUser />
+        
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <h1 className="title mb-4">Music Player</h1>
+            <p className="text-gray-600 mb-4">No songs available</p>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
