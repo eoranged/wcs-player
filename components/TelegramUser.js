@@ -1,11 +1,28 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import styles from '../styles/TelegramUser.module.css';
+import { useAppConfig } from '../hooks/useAppConfig';
 
-const TelegramUser = () => {
+// Create context for sharing user data and config
+export const TelegramContext = createContext({
+  user: null,
+  config: {
+    isAdmin: false,
+    features: { debugPanel: false }
+  }
+});
+
+// Hook to use the telegram context
+export const useTelegramContext = () => useContext(TelegramContext);
+
+// Provider component
+export const TelegramProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isTelegramApp, setIsTelegramApp] = useState(false);
   const [initAttempts, setInitAttempts] = useState(0);
   const initCompletedRef = useRef(false);
+  
+  // Get app config based on user
+  const { config } = useAppConfig(user);
 
   useEffect(() => {
     // Prevent initialization if we've already completed it or made too many attempts
@@ -128,48 +145,45 @@ const TelegramUser = () => {
     }
   }, [initAttempts, user]);
 
-  // Don't render anything if we're not in a Telegram app and not in development
-  if (!isTelegramApp && process.env.NODE_ENV !== 'development') {
+  return (
+    <TelegramContext.Provider value={{ user, config }}>
+      {children}
+    </TelegramContext.Provider>
+  );
+};
+
+// User display component
+const TelegramUser = () => {
+  const { user } = useTelegramContext();
+
+  // Don't render anything if no user
+  if (!user) {
     return null;
   }
 
-  // If we have user data, show the user info
-  if (user) {
-    return (
-      <div className={styles.telegramUser}>
-        {user.photo_url && (
-          <img 
-            src={user.photo_url} 
-            alt={`${user.first_name}'s avatar`} 
-            className={styles.avatar}
-            onError={(e) => {
-              // Only log error once
-              if (!e.target.hasErrorLogged) {
-                console.error('Error loading avatar image');
-                e.target.hasErrorLogged = true;
-              }
-              e.target.onerror = null;
-              e.target.src = 'https://placehold.co/30x30?text=U';
-            }}
-          />
-        )}
-        <span className={styles.userName}>
-          {user.first_name} {user.last_name || ''}
-        </span>
-      </div>
-    );
-  }
-  
-  // In development, show debug info if no user
-  if (process.env.NODE_ENV === 'development') {
-    return (
-      <div className={styles.telegramUser}>
-        <span className={styles.debugInfo}>Telegram: {isTelegramApp ? 'Yes' : 'No'}</span>
-      </div>
-    );
-  }
-  
-  return null;
+  return (
+    <div className={styles.telegramUser}>
+      {user.photo_url && (
+        <img 
+          src={user.photo_url} 
+          alt={`${user.first_name}'s avatar`} 
+          className={styles.avatar}
+          onError={(e) => {
+            // Only log error once
+            if (!e.target.hasErrorLogged) {
+              console.error('Error loading avatar image');
+              e.target.hasErrorLogged = true;
+            }
+            e.target.onerror = null;
+            e.target.src = 'https://placehold.co/30x30?text=U';
+          }}
+        />
+      )}
+      <span className={styles.userName}>
+        {user.first_name} {user.last_name || ''}
+      </span>
+    </div>
+  );
 };
 
 export default TelegramUser;

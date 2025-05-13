@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import Layout from '../components/Layout';
+import { TelegramProvider } from '../components/TelegramUser';
 
-export default function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }) {
   const [isClient, setIsClient] = useState(false);
   const [telegramLoaded, setTelegramLoaded] = useState(false);
 
@@ -57,11 +58,15 @@ export default function MyApp({ Component, pageProps }) {
 
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4">
         {isClient && (
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <TelegramProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </TelegramProvider>
         )}
       </div>
     </>
   );
 }
+
+export default MyApp;
