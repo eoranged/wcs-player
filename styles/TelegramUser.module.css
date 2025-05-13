@@ -1,14 +1,16 @@
 .telegramUser {
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   display: flex;
   align-items: center;
   padding: 5px 10px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  z-index: 10;
+  z-index: 1000;
   max-width: 300px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .avatar {
@@ -17,14 +19,14 @@
   border-radius: 50%;
   margin-right: 8px;
   object-fit: cover;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
 }
 
 .userName {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   max-width: 150px;
   white-space: nowrap;
   overflow: hidden;
@@ -33,8 +35,8 @@
 
 .debugInfo {
   font-size: 12px;
-  color: #666;
-  max-width: 250px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

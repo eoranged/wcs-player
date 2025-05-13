@@ -1,49 +1,57 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from '../styles/TelegramUser.module.css';
 
 const TelegramUser = () => {
   const [user, setUser] = useState(null);
   const [isTelegramApp, setIsTelegramApp] = useState(false);
-  const [debugInfo, setDebugInfo] = useState('Initializing...');
+  const [initAttempts, setInitAttempts] = useState(0);
+  const initCompletedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent initialization if we've already completed it or made too many attempts
+    if (initCompletedRef.current || initAttempts > 2) {
+      return;
+    }
+
     // Function to initialize Telegram WebApp
     const initTelegramWebApp = () => {
       try {
         // Check if we're in a browser environment
         if (typeof window === 'undefined') {
-          setDebugInfo('Not in browser environment');
           return;
         }
 
         // Check if Telegram WebApp is available
-        if (!window.Telegram) {
-          setDebugInfo('window.Telegram not found');
-          return;
-        }
-
-        if (!window.Telegram.WebApp) {
-          setDebugInfo('window.Telegram.WebApp not found');
+        if (!window.Telegram || !window.Telegram.WebApp) {
+          // In development, create a mock user after the first attempt
+          if (process.env.NODE_ENV === 'development' && initAttempts > 0) {
+            createMockUser();
+          }
           return;
         }
 
         // We have confirmed Telegram WebApp is available
         setIsTelegramApp(true);
         
-        // Log all available properties for debugging
-        console.log('Telegram WebApp properties:', {
-          initData: window.Telegram.WebApp.initData,
-          initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
-          user: window.Telegram.WebApp.initDataUnsafe?.user,
-          directUser: window.Telegram.WebApp.user
-        });
+        // Only log properties on first attempt to avoid console spam
+        if (initAttempts === 0) {
+          console.log('Telegram WebApp properties:', {
+            initData: window.Telegram.WebApp.initData,
+            initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
+            user: window.Telegram.WebApp.initDataUnsafe?.user,
+            directUser: window.Telegram.WebApp.user
+          });
+        }
         
         // Try to get user data
         try {
           // Direct access to WebApp.user is the most reliable method
           if (window.Telegram.WebApp.user) {
             setUser(window.Telegram.WebApp.user);
-            console.log('User found directly:', window.Telegram.WebApp.user);
+            if (initAttempts === 0) {
+              console.log('User found directly:', window.Telegram.WebApp.user);
+            }
+            initCompletedRef.current = true;
             return;
           }
           
@@ -51,46 +59,74 @@ const TelegramUser = () => {
           const initDataUnsafe = window.Telegram.WebApp.initDataUnsafe;
           if (initDataUnsafe && initDataUnsafe.user) {
             setUser(initDataUnsafe.user);
-            console.log('User found through initDataUnsafe:', initDataUnsafe.user);
+            if (initAttempts === 0) {
+              console.log('User found through initDataUnsafe:', initDataUnsafe.user);
+            }
+            initCompletedRef.current = true;
             return;
           }
           
           // If we're here, we couldn't find user data
-          console.log('No user data found in Telegram WebApp');
+          if (initAttempts === 0) {
+            console.log('No user data found in Telegram WebApp');
+          }
           
-          // For testing purposes, create a mock user
-          if (process.env.NODE_ENV === 'development') {
-            const mockUser = {
-              id: 12345,
-              first_name: 'Test',
-              last_name: 'User',
-              username: 'testuser',
-              photo_url: 'https://placehold.co/100x100?text=TU'
-            };
-            setUser(mockUser);
-            console.log('Created mock user for development:', mockUser);
+          // For testing purposes, create a mock user in development
+          if (process.env.NODE_ENV === 'development' && initAttempts > 0) {
+            createMockUser();
           }
         } catch (userError) {
-          console.error('Error accessing user data:', userError);
+          if (initAttempts === 0) {
+            console.error('Error accessing user data:', userError);
+          }
+          
+          // Create mock user in development on error
+          if (process.env.NODE_ENV === 'development') {
+            createMockUser();
+          }
         }
       } catch (error) {
-        console.error('Error initializing Telegram WebApp:', error);
+        if (initAttempts === 0) {
+          console.error('Error initializing Telegram WebApp:', error);
+        }
+      }
+    };
+    
+    // Helper function to create a mock user in development
+    const createMockUser = () => {
+      if (!user && !initCompletedRef.current) {
+        const mockUser = {
+          id: 12345,
+          first_name: 'Test',
+          last_name: 'User',
+          username: 'testuser',
+          photo_url: 'https://placehold.co/100x100?text=TU'
+        };
+        setUser(mockUser);
+        if (initAttempts === 0) {
+          console.log('Created mock user for development');
+        }
+        initCompletedRef.current = true;
       }
     };
 
     // Run initialization
     initTelegramWebApp();
+    setInitAttempts(prev => prev + 1);
 
     // Add a small delay and try again (sometimes Telegram WebApp loads after our component)
-    const retryTimeout = setTimeout(() => {
-      if (!user) {
-        console.log('Retrying Telegram WebApp initialization...');
-        initTelegramWebApp();
-      }
-    }, 1000);
-
-    return () => clearTimeout(retryTimeout);
-  }, [user]);
+    // But only do this once to avoid infinite retries
+    if (initAttempts < 2) {
+      const retryTimeout = setTimeout(() => {
+        if (!user && !initCompletedRef.current) {
+          initTelegramWebApp();
+          setInitAttempts(prev => prev + 1);
+        }
+      }, 1000);
+      
+      return () => clearTimeout(retryTimeout);
+    }
+  }, [initAttempts, user]);
 
   // Don't render anything if we're not in a Telegram app and not in development
   if (!isTelegramApp && process.env.NODE_ENV !== 'development') {
@@ -106,6 +142,15 @@ const TelegramUser = () => {
             src={user.photo_url} 
             alt={`${user.first_name}'s avatar`} 
             className={styles.avatar}
+            onError={(e) => {
+              // Only log error once
+              if (!e.target.hasErrorLogged) {
+                console.error('Error loading avatar image');
+                e.target.hasErrorLogged = true;
+              }
+              e.target.onerror = null;
+              e.target.src = 'https://placehold.co/30x30?text=U';
+            }}
           />
         )}
         <span className={styles.userName}>
