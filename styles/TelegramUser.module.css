@@ -8,6 +8,7 @@
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 20px;
   z-index: 10;
+  max-width: 300px;
 }
 
 .avatar {
@@ -17,6 +18,7 @@
   margin-right: 8px;
   object-fit: cover;
   border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .userName {
@@ -27,4 +29,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.debugInfo {
+  font-size: 12px;
+  color: #666;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
