@@ -18,24 +18,22 @@ export const useAudioPlayer = (initialSongs = []) => {
   // Get current song safely
   const currentSong = songs && songs.length > 0 ? songs[currentSongIndex] || {} : {};
   
-  // Debug current state
+  // Log significant state changes only
   useEffect(() => {
-    console.log('Audio Player State:', { 
-      songsCount: songs?.length || 0, 
-      currentSongIndex, 
-      isPlaying, 
-      currentSong: currentSong?.title || 'none',
-      audioSrc: audioRef.current?.src || 'none'
-    });
-  }, [songs, currentSongIndex, isPlaying, currentSong]);
+    // Only log when playback state changes or song changes
+    if (songs?.length > 0) {
+      const songTitle = currentSong?.title || 'unknown';
+      if (isPlaying) {
+        console.log(`Playing: ${songTitle} (${currentSongIndex + 1}/${songs.length})`);
+      }
+    }
+  }, [isPlaying, currentSongIndex, currentSong?.title]);
 
   const togglePlayPause = useCallback(() => {
     if (!audioRef.current) {
       console.error('Audio element not initialized');
       return;
     }
-    
-    console.log('Toggle play/pause, current state:', isPlaying ? 'playing' : 'paused');
     
     if (isPlaying) {
       // If already playing, pause
@@ -53,10 +51,7 @@ export const useAudioPlayer = (initialSongs = []) => {
       
       // Make sure we have a valid audio source
       if (!audioRef.current.src || audioRef.current.src === window.location.href) {
-        console.log('No valid audio source, setting from current song');
-        
         if (currentSong && currentSong.audio) {
-          console.log('Setting audio source to:', currentSong.audio);
           audioRef.current.src = currentSong.audio;
           audioRef.current.load();
         } else {
@@ -67,10 +62,8 @@ export const useAudioPlayer = (initialSongs = []) => {
       }
       
       // Play with better error handling
-      console.log('Attempting to play audio...');
       audioRef.current.play()
         .then(() => {
-          console.log('Audio playback started successfully');
           setIsPlaying(true);
         })
         .catch(error => {
@@ -189,16 +182,17 @@ export const useAudioPlayer = (initialSongs = []) => {
     }
   }, [songs, currentSongIndex]);
   
-  // Watch for songs being loaded and initialize audio when they arrive
+  // Initialize audio when songs are loaded
   useEffect(() => {
     if (songs && songs.length > 0 && audioRef.current && !isInitialized) {
-      console.log('Songs loaded, initializing audio player with first song');
       if (songs[0]?.audio) {
+        // Set up audio element with first song
         audioRef.current.src = songs[0].audio;
         audioRef.current.load();
         audioRef.current.volume = 0.7;
         audioRef.current.preload = 'metadata';
         setIsInitialized(true);
+        console.log('Audio player initialized with first song');
       }
     }
   }, [songs, audioRef, isInitialized]);

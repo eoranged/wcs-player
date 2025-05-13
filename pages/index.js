@@ -88,32 +88,31 @@ export default function Home() {
     fetchSongs();
   }, []);
   
-  // Log whenever songs change
+  // Log initial songs load - only once
   useEffect(() => {
-    console.log(`Songs state updated: ${songs.length} songs available`);
     if (songs.length > 0) {
-      console.log('First song:', songs[0].title);
+      console.log(`Songs loaded from API: ${songs.length} songs available`);
     }
-  }, [songs]);
+  }, [songs.length > 0]); // This will only run once when songs are first loaded
 
-  // Log whenever songs change
+  // Initialize player when songs are first loaded
   useEffect(() => {
-    console.log(`Songs state updated: ${songs.length} songs available`);
+    // Only run this effect when songs array changes
     if (songs.length > 0) {
+      console.log(`Songs loaded: ${songs.length} songs available`);
       console.log('First song:', songs[0].title);
       
       // Reset player state when songs are first loaded
       if (currentSongIndex === 0 && !isPlaying && currentTime === 0) {
-        console.log('Songs loaded, initializing player with first song');
-        
         // Use song duration if available, otherwise set to 0
         const songDuration = songs[0].duration || 0;
         setDuration(songDuration);
       }
-    } else {
+    } else if (songs.length === 0) {
       console.log('No songs available in state');
     }
-  }, [songs, currentSongIndex, isPlaying, currentTime, setDuration]);
+    // Only depend on songs array, not the playback state
+  }, [songs]);
 
   const handleRetry = () => {
     setError(null);
