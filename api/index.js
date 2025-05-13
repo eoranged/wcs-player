@@ -1,28 +1,18 @@
-const express = require('express');
+// This file is only used for local development
+// In production, Vercel uses the API routes in the pages/api directory
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
-const path = require('path');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// Import the shared music library
-const musicLibrary = require('../lib/data/musicLibrary');
-
 app.prepare().then(() => {
-  const server = express();
-  
-  // API endpoint to get music library
-  server.get('/api/music', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.json(musicLibrary);
-  });
-
-  // Handle all other requests with Next.js
-  server.all('*', (req, res) => {
-    return handle(req, res);
+  const server = createServer((req, res) => {
+    const parsedUrl = parse(req.url, true);
+    handle(req, res, parsedUrl);
   });
 
   const PORT = process.env.PORT || 3000;
@@ -32,9 +22,8 @@ app.prepare().then(() => {
   });
 });
 
-// For Vercel
+// For Vercel - this won't be used as Vercel will use the pages/api directory directly
 module.exports = (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
   const parsedUrl = parse(req.url, true);
   handle(req, res, parsedUrl);
 };

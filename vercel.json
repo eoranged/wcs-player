@@ -22,5 +22,21 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/api/music",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "s-maxage=1, stale-while-revalidate" }
+      ]
+    },
+    {
+      "source": "/api/music/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "s-maxage=1, stale-while-revalidate" }
+      ]
+    }
   ]
 }
