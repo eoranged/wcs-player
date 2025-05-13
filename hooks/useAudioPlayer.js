@@ -2,7 +2,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { formatTime } from '../utils/formatters';
 
 export const useAudioPlayer = (initialSongs = []) => {
-  const [songs, setSongs] = useState(initialSongs);
+  // Use the songs passed from the parent component directly
+  // This ensures we're always using the latest songs from the parent
+  const songs = initialSongs;
+  
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -33,16 +36,18 @@ export const useAudioPlayer = (initialSongs = []) => {
     }
     
     console.log('Toggle play/pause, current state:', isPlaying ? 'playing' : 'paused');
-    console.log('Audio source:', audioRef.current.src);
     
     if (isPlaying) {
+      // If already playing, pause
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      // If paused, start playing
+      
       // Check if we have songs available
       if (!songs || songs.length === 0) {
         console.error('No songs available to play');
-        alert('No songs available. The music library could not be loaded.');
+        alert('No songs available. Please wait for the music library to load or try again later.');
         return;
       }
       
@@ -56,7 +61,7 @@ export const useAudioPlayer = (initialSongs = []) => {
           audioRef.current.load();
         } else {
           console.error('Current song has no audio URL');
-          alert('The current song has no audio URL. Please select another song.');
+          alert('The current song has no audio URL. Please try again later.');
           return;
         }
       }
@@ -71,7 +76,13 @@ export const useAudioPlayer = (initialSongs = []) => {
         .catch(error => {
           console.error('Error playing audio:', error);
           setIsPlaying(false);
-          alert(`Could not play audio: ${error.message}. This may be due to browser autoplay restrictions or a network issue.`);
+          
+          // More user-friendly error message
+          if (error.name === 'NotAllowedError') {
+            alert('Playback was blocked by your browser. Please interact with the page first (click anywhere) and try again.');
+          } else {
+            alert(`Could not play audio: ${error.message}. This may be due to browser autoplay restrictions or a network issue.`);
+          }
         });
     }
   }, [isPlaying, songs, currentSong]);
@@ -159,15 +170,38 @@ export const useAudioPlayer = (initialSongs = []) => {
       
       // Always set the source when songs change
       if (songs[currentSongIndex]?.audio) {
+        // Set the source and load the audio
         audioRef.current.src = songs[currentSongIndex].audio;
         audioRef.current.load();
+        
+        // Mark as initialized
         setIsInitialized(true);
         console.log('Audio source set to:', songs[currentSongIndex].audio);
+        
+        // Set the volume (in case it was reset)
+        audioRef.current.volume = 0.7;
+        
+        // Set preload to metadata to get duration info
+        audioRef.current.preload = 'metadata';
       } else {
         console.error('No audio URL available for current song');
       }
     }
   }, [songs, currentSongIndex]);
+  
+  // Watch for songs being loaded and initialize audio when they arrive
+  useEffect(() => {
+    if (songs && songs.length > 0 && audioRef.current && !isInitialized) {
+      console.log('Songs loaded, initializing audio player with first song');
+      if (songs[0]?.audio) {
+        audioRef.current.src = songs[0].audio;
+        audioRef.current.load();
+        audioRef.current.volume = 0.7;
+        audioRef.current.preload = 'metadata';
+        setIsInitialized(true);
+      }
+    }
+  }, [songs, audioRef, isInitialized]);
 
   // Add error event listener to audio element
   useEffect(() => {
@@ -187,8 +221,7 @@ export const useAudioPlayer = (initialSongs = []) => {
   }, [audioRef]);
 
   return {
-    songs,
-    setSongs,
+    // Don't return setSongs as we're not managing songs state internally anymore
     currentSongIndex,
     setCurrentSongIndex,
     isPlaying,

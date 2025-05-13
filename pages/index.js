@@ -9,11 +9,13 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
 export default function Home() {
+  // Initialize with empty array - songs will be fetched from API
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Use the audio player hook
+  // Use the audio player hook with the songs from state
+  // This ensures the hook always has the latest songs
   const {
     currentSongIndex,
     isPlaying,
@@ -53,11 +55,14 @@ export default function Home() {
   const fetchSongs = async () => {
     try {
       setIsLoading(true);
+      console.log('Fetching music library from API...');
+      
+      // Use the fixed fetchMusicLibrary utility which handles trailing slashes
       const data = await fetchMusicLibrary();
-      console.log('Fetched music library:', data);
       
       // Check if we got valid data
       if (data && Array.isArray(data) && data.length > 0) {
+        console.log(`Setting songs state with ${data.length} songs from API`);
         setSongs(data);
         setError(null);
         return data;
@@ -79,22 +84,36 @@ export default function Home() {
 
   // Load songs on component mount
   useEffect(() => {
+    console.log('Component mounted, fetching songs from API...');
     fetchSongs();
   }, []);
-
-  // Debug songs state changes
+  
+  // Log whenever songs change
   useEffect(() => {
-    console.log('Songs state updated:', songs);
+    console.log(`Songs state updated: ${songs.length} songs available`);
+    if (songs.length > 0) {
+      console.log('First song:', songs[0].title);
+    }
   }, [songs]);
 
+  // Log whenever songs change
   useEffect(() => {
+    console.log(`Songs state updated: ${songs.length} songs available`);
     if (songs.length > 0) {
-      setCurrentSongIndex(0);
-      setIsPlaying(false);
-      setCurrentTime(0);
-      setDuration(songs[0].duration);
+      console.log('First song:', songs[0].title);
+      
+      // Reset player state when songs are first loaded
+      if (currentSongIndex === 0 && !isPlaying && currentTime === 0) {
+        console.log('Songs loaded, initializing player with first song');
+        
+        // Use song duration if available, otherwise set to 0
+        const songDuration = songs[0].duration || 0;
+        setDuration(songDuration);
+      }
+    } else {
+      console.log('No songs available in state');
     }
-  }, [songs, setCurrentSongIndex, setIsPlaying, setCurrentTime, setDuration]);
+  }, [songs, currentSongIndex, isPlaying, currentTime, setDuration]);
 
   const handleRetry = () => {
     setError(null);
