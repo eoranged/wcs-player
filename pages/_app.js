@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
+import Layout from '../components/Layout';
 
 export default function MyApp({ Component, pageProps }) {
   const [isClient, setIsClient] = useState(false);
@@ -55,7 +56,11 @@ export default function MyApp({ Component, pageProps }) {
       />
 
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4">
-        {isClient && <Component {...pageProps} />}
+        {isClient && (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
       </div>
     </>
   );

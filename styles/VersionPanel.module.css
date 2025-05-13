@@ -1,0 +1,17 @@
+.versionPanel {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  padding: 0;
+  z-index: 10;
+}
+
+.versionText {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background-color: transparent;
+}

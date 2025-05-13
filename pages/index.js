@@ -8,6 +8,7 @@ import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TelegramUser from '../components/TelegramUser';
+import VersionPanel from '../components/VersionPanel';
 
 export default function Home() {
   // Initialize with empty array - songs will be fetched from API
