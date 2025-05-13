@@ -81,26 +81,118 @@ export const useAudioPlayer = (initialSongs = []) => {
   }, [isPlaying, songs, currentSong]);
 
   const playNextSong = useCallback(() => {
-    setCurrentSongIndex(prevIndex => 
-      prevIndex === songs.length - 1 ? 0 : prevIndex + 1
-    );
-  }, [songs.length]);
+    // First check if we have songs
+    if (!songs || songs.length === 0) {
+      return;
+    }
+    
+    // Calculate the new index
+    const newIndex = currentSongIndex === songs.length - 1 ? 0 : currentSongIndex + 1;
+    
+    // Pause current playback before changing songs
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    // Update the current song index
+    setCurrentSongIndex(newIndex);
+    
+    // Handle the audio source change
+    const handleSourceChange = () => {
+      if (audioRef.current && songs[newIndex]?.audio) {
+        // Set new source
+        audioRef.current.src = songs[newIndex].audio;
+        audioRef.current.load();
+        
+        // Only auto-play if we were already playing
+        if (isPlaying) {
+          const playPromise = audioRef.current.play();
+          
+          // Handle the play promise properly
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                // Playback started successfully
+              })
+              .catch(error => {
+                // Auto-play was prevented
+                console.error('Error auto-playing next song:', error);
+                setIsPlaying(false);
+              });
+          }
+        }
+      }
+    };
+    
+    // Use a small delay to ensure the browser has time to process
+    setTimeout(handleSourceChange, 100);
+  }, [songs, currentSongIndex, isPlaying, audioRef]);
 
   const playPreviousSong = useCallback(() => {
-    setCurrentSongIndex(prevIndex =>
-      prevIndex === 0 ? songs.length - 1 : prevIndex - 1
-    );
-  }, [songs.length]);
+    // First check if we have songs
+    if (!songs || songs.length === 0) {
+      return;
+    }
+    
+    // Calculate the new index
+    const newIndex = currentSongIndex === 0 ? songs.length - 1 : currentSongIndex - 1;
+    
+    // Pause current playback before changing songs
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    // Update the current song index
+    setCurrentSongIndex(newIndex);
+    
+    // Handle the audio source change
+    const handleSourceChange = () => {
+      if (audioRef.current && songs[newIndex]?.audio) {
+        // Set new source
+        audioRef.current.src = songs[newIndex].audio;
+        audioRef.current.load();
+        
+        // Only auto-play if we were already playing
+        if (isPlaying) {
+          const playPromise = audioRef.current.play();
+          
+          // Handle the play promise properly
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                // Playback started successfully
+              })
+              .catch(error => {
+                // Auto-play was prevented
+                console.error('Error auto-playing previous song:', error);
+                setIsPlaying(false);
+              });
+          }
+        }
+      }
+    };
+    
+    // Use a small delay to ensure the browser has time to process
+    setTimeout(handleSourceChange, 100);
+  }, [songs, currentSongIndex, isPlaying, audioRef]);
 
   const handleTimeUpdate = useCallback(() => {
     if (!audioRef.current) return;
     
     const current = audioRef.current.currentTime;
     const duration = audioRef.current.duration;
-    setCurrentTime(current);
-    setDuration(duration || 0);
     
-    if (progressBarRef.current) {
+    // Only update if values are valid numbers
+    if (!isNaN(current)) {
+      setCurrentTime(current);
+    }
+    
+    if (!isNaN(duration) && duration > 0) {
+      setDuration(duration);
+    }
+    
+    // Update progress bar if both values are valid
+    if (progressBarRef.current && !isNaN(current) && !isNaN(duration) && duration > 0) {
       const progressPercent = (current / duration) * 100;
       progressBarRef.current.style.width = `${progressPercent}%`;
     }
@@ -119,33 +211,42 @@ export const useAudioPlayer = (initialSongs = []) => {
     setCurrentTime(timeToSeek);
   }, [duration]);
 
-  // Update audio source when song changes
+  // Initialize audio element when first loaded
   useEffect(() => {
-    if (songs.length > 0 && audioRef.current) {
-      console.log('Updating audio source to:', currentSong.audio || 'none');
-      
-      // Only update if we have a valid audio source
+    if (songs.length > 0 && audioRef.current && !isInitialized) {
+      // Only run this once for initial setup
       if (currentSong.audio) {
+        // Set the source and load the audio
         audioRef.current.src = currentSong.audio;
-        audioRef.current.load(); // Force reload of the audio source
+        audioRef.current.load();
         
-        if (isPlaying) {
-          console.log('Auto-playing after source change');
-          audioRef.current.play()
-            .then(() => {
-              console.log('Playback started after source change');
-            })
-            .catch(error => {
-              console.error('Error playing audio after source change:', error);
-              setIsPlaying(false);
-            });
-        }
-      } else {
-        console.error('No audio source available for current song');
-        setIsPlaying(false);
+        // Mark as initialized
+        setIsInitialized(true);
+        
+        // Set the volume (in case it was reset)
+        audioRef.current.volume = 0.7;
+        
+        // Set preload to metadata to get duration info
+        audioRef.current.preload = 'metadata';
       }
     }
-  }, [currentSongIndex, songs, isPlaying, currentSong?.audio]);
+  }, [songs, audioRef, currentSong?.audio, isInitialized]);
+  
+  // Handle duration updates when metadata is loaded
+  useEffect(() => {
+    const handleLoadedMetadata = () => {
+      if (audioRef.current) {
+        setDuration(audioRef.current.duration || 0);
+      }
+    };
+    
+    if (audioRef.current) {
+      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+      return () => {
+        audioRef.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      };
+    }
+  }, [audioRef]);
 
   // Clean up animation frame on unmount
   useEffect(() => {
