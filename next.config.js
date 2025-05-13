@@ -27,8 +27,7 @@ const devConfig = {
 // Production configuration
 const prodConfig = {
   ...baseConfig,
-  output: 'export',
-  distDir: 'out',
+  // Removed 'output: export' to enable API routes in production
   skipTrailingSlashRedirect: true,
   exportPathMap: async function() {
     return {
