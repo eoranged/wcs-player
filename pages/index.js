@@ -7,7 +7,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const [tempoRange, setTempoRange] = useState({ min: 80, max: 120 });
+  const [tempoRange, setTempoRange] = useState({ min: 80, max: 100 });
   const [activeThumb, setActiveThumb] = useState(null); // 'min' or 'max'
   
   const audioRef = useRef(null);
@@ -145,13 +145,13 @@ export default function Home() {
     const rect = slider.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = Math.min(Math.max(x / rect.width, 0), 1);
-    const value = Math.round(50 + percentage * 150); // 50-200 range
+    const value = Math.round(20 + percentage * 180); // 20-200 BPM range
     
     if (activeThumb === 'min') {
       const newMin = Math.min(value, tempoRange.max - 10);
       setTempoRange(prev => ({ ...prev, min: newMin }));
       if (audioRef.current) {
-        audioRef.current.playbackRate = newMin / 100;
+        audioRef.current.playbackRate = newMin / 100; // Keep playback rate as a percentage
       }
     } else if (activeThumb === 'max') {
       const newMax = Math.max(value, tempoRange.min + 10);
@@ -264,7 +264,7 @@ export default function Home() {
         <div className="mb-6">
           <div className="flex justify-between text-sm text-gray-300 mb-4">
             <span>Tempo Range:</span>
-            <span>{tempoRange.min}% - {tempoRange.max}%</span>
+            <span>{tempoRange.min} - {tempoRange.max} BPM</span>
           </div>
           
           <div className="relative h-12">
@@ -274,8 +274,8 @@ export default function Home() {
               <div 
                 className="absolute h-full bg-blue-500 rounded-full"
                 style={{
-                  left: `${((tempoRange.min - 50) / 150) * 100}%`,
-                  right: `${100 - ((tempoRange.max - 50) / 150) * 100}%`
+                  left: `${((tempoRange.min - 20) / 180) * 100}%`,
+                  right: `${100 - ((tempoRange.max - 20) / 180) * 100}%`
                 }}
               ></div>
             </div>
@@ -284,14 +284,14 @@ export default function Home() {
             <div 
               className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
               style={{
-                left: `${((tempoRange.min - 50) / 150) * 100}%`,
+                left: `${((tempoRange.min - 20) / 180) * 100}%`,
                 top: '50%'
               }}
               onMouseDown={(e) => handleThumbMouseDown(e, 'min')}
               onTouchStart={(e) => handleThumbTouchStart(e, 'min')}
             >
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
-                {tempoRange.min}%
+                {tempoRange.min} BPM
               </div>
             </div>
             
@@ -299,14 +299,14 @@ export default function Home() {
             <div 
               className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
               style={{
-                left: `${((tempoRange.max - 50) / 150) * 100}%`,
+                left: `${((tempoRange.max - 20) / 180) * 100}%`,
                 top: '50%'
               }}
               onMouseDown={(e) => handleThumbMouseDown(e, 'max')}
               onTouchStart={(e) => handleThumbTouchStart(e, 'max')}
             >
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
-                {tempoRange.max}%
+                {tempoRange.max} BPM
               </div>
             </div>
             
@@ -317,18 +317,18 @@ export default function Home() {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const percentage = x / rect.width;
-                const value = Math.round(50 + percentage * 150);
+                const value = Math.round(20 + percentage * 180);
                 
                 // Determine which thumb is closer
-                const minDist = Math.abs((tempoRange.min - 50) / 150 - percentage);
-                const maxDist = Math.abs((tempoRange.max - 50) / 150 - percentage);
+                const minDist = Math.abs((tempoRange.min - 20) / 180 - percentage);
+                const maxDist = Math.abs((tempoRange.max - 20) / 180 - percentage);
                 
                 if (minDist < maxDist) {
                   // Click is closer to min thumb
-                  const newMin = Math.min(Math.max(50, value), tempoRange.max - 10);
+                  const newMin = Math.min(Math.max(20, value), tempoRange.max - 10);
                   setTempoRange(prev => ({ ...prev, min: newMin }));
                   if (audioRef.current) {
-                    audioRef.current.playbackRate = newMin / 100;
+                    audioRef.current.playbackRate = newMin / 100; // Keep playback rate as a percentage
                   }
                 } else {
                   // Click is closer to max thumb
