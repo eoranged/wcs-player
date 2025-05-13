@@ -29,33 +29,52 @@ const TelegramUser = () => {
 
         // We have confirmed Telegram WebApp is available
         setIsTelegramApp(true);
-        setDebugInfo('Telegram WebApp found');
+        
+        // Log all available properties for debugging
+        console.log('Telegram WebApp properties:', {
+          initData: window.Telegram.WebApp.initData,
+          initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
+          user: window.Telegram.WebApp.initDataUnsafe?.user,
+          directUser: window.Telegram.WebApp.user
+        });
         
         // Try to get user data
         try {
-          const initData = window.Telegram.WebApp.initData;
+          // Direct access to WebApp.user is the most reliable method
+          if (window.Telegram.WebApp.user) {
+            setUser(window.Telegram.WebApp.user);
+            console.log('User found directly:', window.Telegram.WebApp.user);
+            return;
+          }
+          
+          // Try through initDataUnsafe
           const initDataUnsafe = window.Telegram.WebApp.initDataUnsafe;
-          
-          setDebugInfo(`InitData: ${initData ? 'exists' : 'missing'}, InitDataUnsafe: ${initDataUnsafe ? 'exists' : 'missing'}`);
-          
           if (initDataUnsafe && initDataUnsafe.user) {
             setUser(initDataUnsafe.user);
-            setDebugInfo(`User found: ${initDataUnsafe.user.first_name}`);
-          } else {
-            // Try alternative method - directly access user
-            const webAppUser = window.Telegram.WebApp.user;
-            if (webAppUser) {
-              setUser(webAppUser);
-              setDebugInfo(`User found via WebApp.user: ${webAppUser.first_name}`);
-            } else {
-              setDebugInfo('No user data found in Telegram WebApp');
-            }
+            console.log('User found through initDataUnsafe:', initDataUnsafe.user);
+            return;
+          }
+          
+          // If we're here, we couldn't find user data
+          console.log('No user data found in Telegram WebApp');
+          
+          // For testing purposes, create a mock user
+          if (process.env.NODE_ENV === 'development') {
+            const mockUser = {
+              id: 12345,
+              first_name: 'Test',
+              last_name: 'User',
+              username: 'testuser',
+              photo_url: 'https://placehold.co/100x100?text=TU'
+            };
+            setUser(mockUser);
+            console.log('Created mock user for development:', mockUser);
           }
         } catch (userError) {
-          setDebugInfo(`Error accessing user data: ${userError.message}`);
+          console.error('Error accessing user data:', userError);
         }
       } catch (error) {
-        setDebugInfo(`Error initializing: ${error.message}`);
+        console.error('Error initializing Telegram WebApp:', error);
       }
     };
 
@@ -64,41 +83,48 @@ const TelegramUser = () => {
 
     // Add a small delay and try again (sometimes Telegram WebApp loads after our component)
     const retryTimeout = setTimeout(() => {
-      if (!isTelegramApp) {
-        setDebugInfo('Retrying initialization...');
+      if (!user) {
+        console.log('Retrying Telegram WebApp initialization...');
         initTelegramWebApp();
       }
     }, 1000);
 
     return () => clearTimeout(retryTimeout);
-  }, [isTelegramApp]);
+  }, [user]);
 
-  // Always render something in development for debugging
-  const isDev = process.env.NODE_ENV === 'development';
-
-  // In production, don't render anything if not in Telegram or no user data
-  if (!isDev && !isTelegramApp) {
+  // Don't render anything if we're not in a Telegram app and not in development
+  if (!isTelegramApp && process.env.NODE_ENV !== 'development') {
     return null;
   }
 
-  return (
-    <div className={styles.telegramUser}>
-      {user && user.photo_url && (
-        <img 
-          src={user.photo_url} 
-          alt={`${user.first_name}'s avatar`} 
-          className={styles.avatar}
-        />
-      )}
-      {user ? (
+  // If we have user data, show the user info
+  if (user) {
+    return (
+      <div className={styles.telegramUser}>
+        {user.photo_url && (
+          <img 
+            src={user.photo_url} 
+            alt={`${user.first_name}'s avatar`} 
+            className={styles.avatar}
+          />
+        )}
         <span className={styles.userName}>
           {user.first_name} {user.last_name || ''}
         </span>
-      ) : (
-        <span className={styles.debugInfo}>{debugInfo}</span>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+  
+  // In development, show debug info if no user
+  if (process.env.NODE_ENV === 'development') {
+    return (
+      <div className={styles.telegramUser}>
+        <span className={styles.debugInfo}>Telegram: {isTelegramApp ? 'Yes' : 'No'}</span>
+      </div>
+    );
+  }
+  
+  return null;
 };
 
 export default TelegramUser;
