@@ -138,49 +138,93 @@ export default function Home() {
     }
   };
   
-  const handleSliderMouseMove = (e) => {
+  const calculateValueFromPosition = useCallback((clientX, slider) => {
+    const rect = slider.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const percentage = x / rect.width;
+    return Math.round(20 + percentage * 180); // 20-200 BPM range
+  }, []);
+
+  const handleSliderMouseMove = useCallback((e) => {
     if (!activeThumb) return;
     
-    const slider = e.currentTarget;
-    const rect = slider.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = Math.min(Math.max(x / rect.width, 0), 1);
-    const value = Math.round(20 + percentage * 180); // 20-200 BPM range
+    e.preventDefault();
+    
+    // Get the slider element
+    const slider = document.querySelector('.relative.h-12');
+    if (!slider) return;
+    
+    const value = calculateValueFromPosition(e.clientX, slider);
     
     if (activeThumb === 'min') {
-      const newMin = Math.min(value, tempoRange.max - 10);
+      const newMin = Math.min(Math.max(20, value), tempoRange.max - 10);
       setTempoRange(prev => ({ ...prev, min: newMin }));
       if (audioRef.current) {
-        audioRef.current.playbackRate = newMin / 100; // Keep playback rate as a percentage
+        audioRef.current.playbackRate = newMin / 100;
       }
     } else if (activeThumb === 'max') {
-      const newMax = Math.max(value, tempoRange.min + 10);
+      const newMax = Math.max(Math.min(200, value), tempoRange.min + 10);
       setTempoRange(prev => ({ ...prev, max: newMax }));
       if (audioRef.current) {
         audioRef.current.playbackRate = newMax / 100;
       }
     }
-  };
+  }, [activeThumb, tempoRange.min, tempoRange.max, calculateValueFromPosition]);
   
-  const handleDocumentMouseUp = useCallback(() => {
+  const handleTrackClick = useCallback((e) => {
+    const slider = e.currentTarget;
+    const value = calculateValueFromPosition(e.clientX, slider);
+    
+    // Calculate which thumb is closer to the clicked position
+    const minDist = Math.abs(tempoRange.min - value);
+    const maxDist = Math.abs(tempoRange.max - value);
+    
+    if (minDist < maxDist) {
+      // Move min thumb
+      const newMin = Math.min(Math.max(20, value), tempoRange.max - 10);
+      setTempoRange(prev => ({ ...prev, min: newMin }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMin / 100;
+      }
+    } else {
+      // Move max thumb
+      const newMax = Math.max(Math.min(200, value), tempoRange.min + 10);
+      setTempoRange(prev => ({ ...prev, max: newMax }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMax / 100;
+      }
+    }
+  }, [tempoRange.min, tempoRange.max, calculateValueFromPosition]);
+  
+  const handleDocumentMouseUp = useCallback((e) => {
+    // Remove active class from all thumbs
+    document.querySelectorAll('.thumb').forEach(thumb => {
+      thumb.classList.remove('active');
+    });
     setActiveThumb(null);
   }, []);
   
   useEffect(() => {
     if (activeThumb) {
+      // Prevent text selection during drag
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'grabbing';
+      
       document.addEventListener('mousemove', handleSliderMouseMove);
       document.addEventListener('mouseup', handleDocumentMouseUp);
       document.addEventListener('touchmove', handleSliderMouseMove, { passive: false });
       document.addEventListener('touchend', handleDocumentMouseUp);
+      
+      return () => {
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        document.removeEventListener('mousemove', handleSliderMouseMove);
+        document.removeEventListener('mouseup', handleDocumentMouseUp);
+        document.removeEventListener('touchmove', handleSliderMouseMove);
+        document.removeEventListener('touchend', handleDocumentMouseUp);
+      };
     }
-    
-    return () => {
-      document.removeEventListener('mousemove', handleSliderMouseMove);
-      document.removeEventListener('mouseup', handleDocumentMouseUp);
-      document.removeEventListener('touchmove', handleSliderMouseMove);
-      document.removeEventListener('touchend', handleDocumentMouseUp);
-    };
-  }, [activeThumb, tempoRange.min, tempoRange.max]);
+  }, [activeThumb, handleSliderMouseMove, handleDocumentMouseUp]);
 
   // Update playback rate when song changes
   useEffect(() => {
@@ -189,15 +233,20 @@ export default function Home() {
     }
   }, [currentSongIndex, tempoRange.min]);
   
-  const handleThumbMouseDown = (e, thumb) => {
+  const handleThumbMouseDown = useCallback((e, thumb) => {
     e.preventDefault();
+    e.stopPropagation();
     setActiveThumb(thumb);
-  };
+    
+    // Add active class for visual feedback
+    e.currentTarget.classList.add('active');
+  }, []);
   
-  const handleThumbTouchStart = (e, thumb) => {
+  const handleThumbTouchStart = useCallback((e, thumb) => {
     e.preventDefault();
+    e.stopPropagation();
     setActiveThumb(thumb);
-  };
+  }, []);
 
   const formatTime = (time) => {
     if (isNaN(time)) return '0:00';
@@ -282,7 +331,7 @@ export default function Home() {
             
             {/* Min thumb */}
             <div 
-              className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
+              className="thumb absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 active:scale-110 transition-all duration-100 z-10"
               style={{
                 left: `${((tempoRange.min - 20) / 180) * 100}%`,
                 top: '50%'
@@ -291,13 +340,13 @@ export default function Home() {
               onTouchStart={(e) => handleThumbTouchStart(e, 'min')}
             >
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
-                {tempoRange.min} BPM
+                {tempoRange.min}
               </div>
             </div>
             
             {/* Max thumb */}
             <div 
-              className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
+              className="thumb absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 active:scale-110 transition-all duration-100 z-10"
               style={{
                 left: `${((tempoRange.max - 20) / 180) * 100}%`,
                 top: '50%'
@@ -306,38 +355,23 @@ export default function Home() {
               onTouchStart={(e) => handleThumbTouchStart(e, 'max')}
             >
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
-                {tempoRange.max} BPM
+                {tempoRange.max}
               </div>
             </div>
             
             {/* Clickable track for better UX */}
             <div 
               className="absolute inset-0 cursor-pointer"
-              onMouseDown={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percentage = x / rect.width;
-                const value = Math.round(20 + percentage * 180);
-                
-                // Determine which thumb is closer
-                const minDist = Math.abs((tempoRange.min - 20) / 180 - percentage);
-                const maxDist = Math.abs((tempoRange.max - 20) / 180 - percentage);
-                
-                if (minDist < maxDist) {
-                  // Click is closer to min thumb
-                  const newMin = Math.min(Math.max(20, value), tempoRange.max - 10);
-                  setTempoRange(prev => ({ ...prev, min: newMin }));
-                  if (audioRef.current) {
-                    audioRef.current.playbackRate = newMin / 100; // Keep playback rate as a percentage
-                  }
-                } else {
-                  // Click is closer to max thumb
-                  const newMax = Math.max(Math.min(200, value), tempoRange.min + 10);
-                  setTempoRange(prev => ({ ...prev, max: newMax }));
-                  if (audioRef.current) {
-                    audioRef.current.playbackRate = newMax / 100;
-                  }
-                }
+              onMouseDown={handleTrackClick}
+              onTouchStart={(e) => {
+                // For touch devices, use the first touch point
+                const touch = e.touches[0];
+                const fakeEvent = { 
+                  clientX: touch.clientX,
+                  currentTarget: e.currentTarget,
+                  preventDefault: () => {}
+                };
+                handleTrackClick(fakeEvent);
               }}
             />
           </div>
