@@ -269,10 +269,10 @@ export default function Home() {
   const currentSong = songs[currentSongIndex];
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-gray-800 rounded-2xl p-6 shadow-2xl">
+    <div className="max-w-md mx-auto h-screen flex flex-col">
+      <div className="bg-gray-800 rounded-2xl p-4 shadow-2xl flex-1 flex flex-col overflow-hidden">
         {/* Album Art */}
-        <div className="relative pt-[100%] mb-6 rounded-xl overflow-hidden bg-gray-700">
+        <div className="relative pt-[80%] mb-4 rounded-xl overflow-hidden bg-gray-700 flex-shrink-0">
           {currentSong.cover && (
             <img
               src={currentSong.cover}
@@ -283,14 +283,14 @@ export default function Home() {
         </div>
 
         {/* Song Info */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4 flex-shrink-0">
           <h2 className="text-xl font-bold mb-1">{currentSong.title}</h2>
           <p className="text-gray-300">{currentSong.artist}</p>
           <p className="text-sm text-gray-400">{currentSong.album}</p>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-4">
+        <div className="mb-4 flex-shrink-0">
           <div 
             className="h-1 bg-gray-600 rounded-full cursor-pointer"
             onClick={handleProgressBarClick}
@@ -310,7 +310,7 @@ export default function Home() {
         </div>
 
         {/* Tempo Range Control */}
-        <div className="mb-6">
+        <div className="mb-4 flex-shrink-0">
           <div className="flex justify-between text-sm text-gray-300 mb-4">
             <span>Tempo Range:</span>
             <span>{tempoRange.min} - {tempoRange.max} BPM</span>
@@ -378,7 +378,7 @@ export default function Home() {
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center items-center space-x-8">
+        <div className="flex justify-center items-center space-x-8 mt-auto mb-2">
           <button 
             onClick={playPreviousSong}
             className="text-gray-300 hover:text-white focus:outline-none"
