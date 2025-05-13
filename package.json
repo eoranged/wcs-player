@@ -10,13 +10,14 @@
     "lint": "next lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@vercel/node": "^3.0.10",
-    "express": "^4.18.2",
     "next": "^13.4.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
