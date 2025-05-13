@@ -1,0 +1,17 @@
+.topPanel {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 6px 10px;
+  z-index: 100;
+  min-height: 40px;
+}
+
+.userContainer {
+  display: flex;
+  justify-content: flex-end;
+}

@@ -123,47 +123,31 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="container relative">
-        {/* Telegram User component will show in top right if in Telegram Mini App */}
-        <TelegramUser />
-        
-        <div className="flex items-center justify-center h-screen">
-          <LoadingSpinner text="Loading music library..." />
-        </div>
+      <div className="flex items-center justify-center h-full min-h-[300px]">
+        <LoadingSpinner text="Loading music library..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container relative">
-        {/* Telegram User component will show in top right if in Telegram Mini App */}
-        <TelegramUser />
-        
-        <div className="flex items-center justify-center h-screen p-4">
-          <ErrorMessage message={error} onRetry={handleRetry} className="max-w-md" />
-        </div>
+      <div className="flex items-center justify-center h-full min-h-[300px] p-4">
+        <ErrorMessage message={error} onRetry={handleRetry} className="max-w-md" />
       </div>
     );
   }
 
   if (songs.length === 0) {
     return (
-      <div className="container relative">
-        {/* Telegram User component will show in top right if in Telegram Mini App */}
-        <TelegramUser />
-        
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
-            <h1 className="title mb-4">Music Player</h1>
-            <p className="text-gray-600 mb-4">No songs available</p>
-            <button
-              onClick={handleRetry}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Retry
-            </button>
-          </div>
+      <div className="flex items-center justify-center h-full min-h-[300px]">
+        <div className="text-center">
+          <p className="text-gray-300 mb-4">No songs available</p>
+          <button
+            onClick={handleRetry}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -172,10 +156,15 @@ export default function Home() {
   const currentSong = songs[currentSongIndex];
 
   return (
-    <div className="max-w-md mx-auto h-screen flex flex-col">
-      <div className="bg-gray-800 rounded-2xl p-4 shadow-2xl flex-1 flex flex-col overflow-hidden">
+    <div className="max-w-md mx-auto w-full flex flex-col">
+      <div className="bg-gray-800 rounded-2xl px-4 pb-4 pt-2 shadow-2xl flex flex-col overflow-hidden">
+        {/* Top user info */}
+        <div className="flex justify-end mb-2 -mt-1">
+          <TelegramUser />
+        </div>
+        
         {/* Album Art */}
-        <div className="relative pt-[80%] mb-4 rounded-xl overflow-hidden bg-gray-700 flex-shrink-0">
+        <div className="relative pt-[50%] mb-4 rounded-xl overflow-hidden bg-gray-700 flex-shrink-0 max-w-[250px] mx-auto w-full">
           {currentSong.cover && (
             <img
               src={currentSong.cover}

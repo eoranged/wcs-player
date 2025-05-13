@@ -1,14 +1,13 @@
 import React from 'react';
 import VersionPanel from './VersionPanel';
-import TelegramUser from './TelegramUser';
 
 const Layout = ({ children }) => {
   return (
-    <div className="relative min-h-screen">
-      {/* TelegramUser component at the top level */}
-      <TelegramUser />
+    <div className="relative min-h-screen flex flex-col">
+      <div className="flex-1 overflow-auto">
+        {children}
+      </div>
       
-      {children}
       <VersionPanel />
     </div>
   );
