@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function Home() {
   const [songs, setSongs] = useState([]);
@@ -7,7 +7,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const [tempo, setTempo] = useState(100);
+  const [tempoRange, setTempoRange] = useState({ min: 80, max: 120 });
+  const [activeThumb, setActiveThumb] = useState(null); // 'min' or 'max'
   
   const audioRef = useRef(null);
   const progressBarRef = useRef(null);
@@ -16,11 +17,7 @@ export default function Home() {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        // Use absolute URL in development, relative in production
-        const baseUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3000' 
-          : '';
-        const response = await fetch(`${baseUrl}/api/music`);
+        const response = await fetch('/api/music');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -124,9 +121,82 @@ export default function Home() {
   };
 
   const handleTempoChange = (e) => {
-    const newTempo = parseFloat(e.target.value);
-    setTempo(newTempo);
-    audioRef.current.playbackRate = newTempo / 100;
+    const value = parseInt(e.target.value);
+    
+    if (activeThumb === 'min') {
+      const newMin = Math.min(value, tempoRange.max - 10); // Ensure min is at least 10 less than max
+      setTempoRange(prev => ({ ...prev, min: newMin }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMin / 100;
+      }
+    } else if (activeThumb === 'max') {
+      const newMax = Math.max(value, tempoRange.min + 10); // Ensure max is at least 10 more than min
+      setTempoRange(prev => ({ ...prev, max: newMax }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMax / 100;
+      }
+    }
+  };
+  
+  const handleSliderMouseMove = (e) => {
+    if (!activeThumb) return;
+    
+    const slider = e.currentTarget;
+    const rect = slider.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = Math.min(Math.max(x / rect.width, 0), 1);
+    const value = Math.round(50 + percentage * 150); // 50-200 range
+    
+    if (activeThumb === 'min') {
+      const newMin = Math.min(value, tempoRange.max - 10);
+      setTempoRange(prev => ({ ...prev, min: newMin }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMin / 100;
+      }
+    } else if (activeThumb === 'max') {
+      const newMax = Math.max(value, tempoRange.min + 10);
+      setTempoRange(prev => ({ ...prev, max: newMax }));
+      if (audioRef.current) {
+        audioRef.current.playbackRate = newMax / 100;
+      }
+    }
+  };
+  
+  const handleDocumentMouseUp = useCallback(() => {
+    setActiveThumb(null);
+  }, []);
+  
+  useEffect(() => {
+    if (activeThumb) {
+      document.addEventListener('mousemove', handleSliderMouseMove);
+      document.addEventListener('mouseup', handleDocumentMouseUp);
+      document.addEventListener('touchmove', handleSliderMouseMove, { passive: false });
+      document.addEventListener('touchend', handleDocumentMouseUp);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleSliderMouseMove);
+      document.removeEventListener('mouseup', handleDocumentMouseUp);
+      document.removeEventListener('touchmove', handleSliderMouseMove);
+      document.removeEventListener('touchend', handleDocumentMouseUp);
+    };
+  }, [activeThumb, tempoRange.min, tempoRange.max]);
+
+  // Update playback rate when song changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = tempoRange.min / 100;
+    }
+  }, [currentSongIndex, tempoRange.min]);
+  
+  const handleThumbMouseDown = (e, thumb) => {
+    e.preventDefault();
+    setActiveThumb(thumb);
+  };
+  
+  const handleThumbTouchStart = (e, thumb) => {
+    e.preventDefault();
+    setActiveThumb(thumb);
   };
 
   const formatTime = (time) => {
@@ -190,23 +260,87 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tempo Control */}
+        {/* Tempo Range Control */}
         <div className="mb-6">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>Tempo: {tempo}%</span>
-            <div>
-              <span className="mr-2">Min</span>
-              <span>Max</span>
-            </div>
+          <div className="flex justify-between text-sm text-gray-300 mb-4">
+            <span>Tempo Range:</span>
+            <span>{tempoRange.min}% - {tempoRange.max}%</span>
           </div>
-          <input
-            type="range"
-            min="50"
-            max="200"
-            value={tempo}
-            onChange={handleTempoChange}
-            className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
-          />
+          
+          <div className="relative h-12">
+            {/* Background track */}
+            <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-gray-700 rounded-full -translate-y-1/2">
+              {/* Selected range */}
+              <div 
+                className="absolute h-full bg-blue-500 rounded-full"
+                style={{
+                  left: `${((tempoRange.min - 50) / 150) * 100}%`,
+                  right: `${100 - ((tempoRange.max - 50) / 150) * 100}%`
+                }}
+              ></div>
+            </div>
+            
+            {/* Min thumb */}
+            <div 
+              className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
+              style={{
+                left: `${((tempoRange.min - 50) / 150) * 100}%`,
+                top: '50%'
+              }}
+              onMouseDown={(e) => handleThumbMouseDown(e, 'min')}
+              onTouchStart={(e) => handleThumbTouchStart(e, 'min')}
+            >
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
+                {tempoRange.min}%
+              </div>
+            </div>
+            
+            {/* Max thumb */}
+            <div 
+              className="absolute w-5 h-5 bg-blue-500 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer shadow-md hover:bg-blue-400 transition-colors"
+              style={{
+                left: `${((tempoRange.max - 50) / 150) * 100}%`,
+                top: '50%'
+              }}
+              onMouseDown={(e) => handleThumbMouseDown(e, 'max')}
+              onTouchStart={(e) => handleThumbTouchStart(e, 'max')}
+            >
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
+                {tempoRange.max}%
+              </div>
+            </div>
+            
+            {/* Clickable track for better UX */}
+            <div 
+              className="absolute inset-0 cursor-pointer"
+              onMouseDown={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentage = x / rect.width;
+                const value = Math.round(50 + percentage * 150);
+                
+                // Determine which thumb is closer
+                const minDist = Math.abs((tempoRange.min - 50) / 150 - percentage);
+                const maxDist = Math.abs((tempoRange.max - 50) / 150 - percentage);
+                
+                if (minDist < maxDist) {
+                  // Click is closer to min thumb
+                  const newMin = Math.min(Math.max(50, value), tempoRange.max - 10);
+                  setTempoRange(prev => ({ ...prev, min: newMin }));
+                  if (audioRef.current) {
+                    audioRef.current.playbackRate = newMin / 100;
+                  }
+                } else {
+                  // Click is closer to max thumb
+                  const newMax = Math.max(Math.min(200, value), tempoRange.min + 10);
+                  setTempoRange(prev => ({ ...prev, max: newMax }));
+                  if (audioRef.current) {
+                    audioRef.current.playbackRate = newMax / 100;
+                  }
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* Controls */}
