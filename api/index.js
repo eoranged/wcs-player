@@ -16,6 +16,7 @@ app.prepare().then(() => {
   
   // API endpoint to get music library
   server.get('/api/music', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
     res.json(musicLibrary);
   });
 
@@ -33,6 +34,7 @@ app.prepare().then(() => {
 
 // For Vercel
 module.exports = (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
   const parsedUrl = parse(req.url, true);
   handle(req, res, parsedUrl);
 };
