@@ -221,7 +221,6 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
-        <h3>Settings</h3>
         <div className={styles.spacer}></div>
       </div>
       

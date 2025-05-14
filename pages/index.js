@@ -7,6 +7,7 @@ import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TelegramUser from '../components/TelegramUser';
+import TelegramUserProfile from '../components/TelegramUserProfile';
 import ConfigPanel from '../components/ConfigPanel';
 import VersionPanel from '../components/VersionPanel';
 import { captureError, isSentryInitialized } from '../utils/errorReporting';
@@ -17,6 +18,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
 
@@ -194,10 +196,12 @@ export default function Home() {
       <div className="bg-gray-800 rounded-2xl p-4 shadow-2xl flex flex-col overflow-hidden">
         {/* Top user info */}
         <div className="flex justify-end mb-2 -mt-1">
-          <TelegramUser />
+          <div onClick={() => setShowUserProfile(true)}>
+            <TelegramUser />
+          </div>
         </div>
         
-        {!showConfigPanel ? (
+        {!showConfigPanel && !showUserProfile ? (
           /* Player Content */
           <>
             {/* Album Art */}
@@ -320,7 +324,7 @@ export default function Home() {
               </button>
             </div>
           </>
-        ) : (
+        ) : showConfigPanel ? (
           /* Config Panel Content */
           <ConfigPanel
             onClose={() => setShowConfigPanel(false)}
@@ -328,6 +332,11 @@ export default function Home() {
             onTempoRangeChange={setTempoRange}
             selectedPlaylist={selectedPlaylist}
             onPlaylistChange={setSelectedPlaylist}
+          />
+        ) : (
+          /* User Profile Panel */
+          <TelegramUserProfile
+            onClose={() => setShowUserProfile(false)}
           />
         )}
       </div>

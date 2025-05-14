@@ -169,7 +169,6 @@ export const TelegramProvider = ({ children }) => {
 // User display component
 const TelegramUser = () => {
   const { user } = useTelegramContext();
-  const [showProfile, setShowProfile] = useState(false);
 
   // Don't render anything if no user
   if (!user) {
@@ -177,40 +176,32 @@ const TelegramUser = () => {
   }
 
   return (
-    <>
-      <div 
-        className={styles.telegramUser} 
-        onClick={() => setShowProfile(true)}
-        role="button"
-        aria-label="View profile"
-        title="Click to view profile details"
-      >
-        {user.photo_url && (
-          <img 
-            src={user.photo_url} 
-            alt={`${user.first_name}'s avatar`} 
-            className={styles.avatar}
-            onError={(e) => {
-              // Only log error once
-              if (!e.target.hasErrorLogged) {
-                console.error('Error loading avatar image');
-                e.target.hasErrorLogged = true;
-              }
-              e.target.onerror = null;
-              e.target.src = 'https://placehold.co/30x30?text=U';
-            }}
-          />
-        )}
-        <span className={styles.userName}>
-          {user.first_name} {user.last_name || ''}
-        </span>
-      </div>
-
-      {/* Show profile modal when clicked */}
-      {showProfile && (
-        <TelegramUserProfile onClose={() => setShowProfile(false)} />
+    <div 
+      className={styles.telegramUser} 
+      role="button"
+      aria-label="View profile"
+      title="Click to view profile details"
+    >
+      {user.photo_url && (
+        <img 
+          src={user.photo_url} 
+          alt={`${user.first_name}'s avatar`} 
+          className={styles.avatar}
+          onError={(e) => {
+            // Only log error once
+            if (!e.target.hasErrorLogged) {
+              console.error('Error loading avatar image');
+              e.target.hasErrorLogged = true;
+            }
+            e.target.onerror = null;
+            e.target.src = 'https://placehold.co/30x30?text=U';
+          }}
+        />
       )}
-    </>
+      <span className={styles.userName}>
+        {user.first_name} {user.last_name || ''}
+      </span>
+    </div>
   );
 };
 

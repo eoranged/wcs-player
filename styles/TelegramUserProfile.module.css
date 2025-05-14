@@ -1,125 +1,122 @@
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.profileCard {
-  background: linear-gradient(to bottom, #2c3e50, #1a2530);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  position: relative;
-  animation: slideIn 0.3s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.closeButton {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  font-size: 20px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.profileHeader {
-  padding: 30px 20px 20px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.profileAvatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  object-fit: cover;
-  margin-bottom: 15px;
-}
-
-.profileName {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 5px;
-  color: white;
-}
-
-.profileUsername {
-  font-size: 1rem;
-  color: #64b5f6;
-  margin: 0;
-  opacity: 0.8;
-}
-
-.profileDetails {
-  padding: 20px;
-}
-
-.profileDetails h3 {
-  font-size: 1.1rem;
-  color: white;
-  margin: 0 0 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 10px;
-}
-
-.profileFields {
+/* Container for the entire profile panel */
+.container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.profileField {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.fieldLabel {
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.fieldValue {
   color: white;
-  text-align: right;
-  max-width: 60%;
-  word-break: break-word;
+}
+
+/* Header with back button */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.backButton svg {
+  margin-right: 0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* User info section */
+.userInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Section styling */
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+.languageSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 15px;
+}
+
+.languageOption {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.languageOption:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.selectedLanguage {
+  background-color: rgba(100, 181, 246, 0.2);
+  border: 1px solid rgba(100, 181, 246, 0.5);
+}
+
+.languageFlag {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+
+.languageName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+}
+
+.checkmark {
+  position: absolute;
+  right: 15px;
+  color: #64b5f6;
+  font-size: 1.2rem;
 }
