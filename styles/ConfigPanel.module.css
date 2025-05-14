@@ -1,0 +1,296 @@
+.configPanel {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.configHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: rgba(40, 40, 40, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.configHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  flex: 1;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.backButton:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.spacer {
+  width: 24px;
+}
+
+.configContent {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.configSection {
+  margin-bottom: 24px;
+}
+
+.configSection h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Music Style Dropdown */
+.selectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: rgba(50, 50, 50, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.selectArrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+/* Playlist Combobox */
+.comboboxContainer {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.inputContainer {
+  display: flex;
+  position: relative;
+}
+
+.comboboxInput {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: rgba(50, 50, 50, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+}
+
+.comboboxInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.comboboxButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.comboboxButton:hover {
+  color: white;
+}
+
+.comboboxDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: rgba(40, 40, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  margin-top: 4px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.comboboxItem {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comboboxItem:last-child {
+  border-bottom: none;
+}
+
+.comboboxItem:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.comboboxItemName {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.comboboxItemDescription {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.loadingItem, .emptyItem {
+  padding: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.selectedPlaylist {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: rgba(59, 130, 246, 0.15);
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+}
+
+.selectedPlaylistName {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.selectedPlaylistDescription {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tempoRangeInfo {
+  display: flex;
+  justify-content: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+}
+
+.tempoRangeSlider {
+  position: relative;
+  height: 60px;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.sliderTrack {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: rgba(80, 80, 80, 0.5);
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+.sliderRange {
+  position: absolute;
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 2px;
+}
+
+.sliderThumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.sliderThumb:hover {
+  background-color: #60a5fa;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.sliderThumb:active {
+  background-color: #2563eb;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.thumbLabel {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2563eb;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sliderClickArea {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  cursor: pointer;
+  z-index: 1;
+}

@@ -105,6 +105,7 @@ export const useTempoSlider = (initialMin = 80, initialMax = 100) => {
 
   return {
     tempoRange,
+    setTempoRange,
     activeThumb,
     setActiveThumb,
     setAudioRef,
