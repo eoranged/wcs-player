@@ -174,6 +174,15 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
       if (playlistDropdownRef.current && !playlistDropdownRef.current.contains(event.target) &&
           playlistInputRef.current && !playlistInputRef.current.contains(event.target)) {
         setIsPlaylistDropdownOpen(false);
+        
+        // If no playlist is selected and search is empty, restore the previous selection
+        if (!localSelectedPlaylist && selectedPlaylist) {
+          setLocalSelectedPlaylist(selectedPlaylist);
+          setPlaylistSearch(selectedPlaylist.name);
+        } else if (localSelectedPlaylist) {
+          // Make sure the input shows the selected playlist name
+          setPlaylistSearch(localSelectedPlaylist.name);
+        }
       }
     };
     
@@ -181,7 +190,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [localSelectedPlaylist, selectedPlaylist]);
   
   // Clean up event listeners on unmount
   useEffect(() => {
@@ -245,12 +254,23 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
                 placeholder="Search playlists..."
                 value={playlistSearch}
                 onChange={(e) => setPlaylistSearch(e.target.value)}
-                onFocus={() => setIsPlaylistDropdownOpen(true)}
+                onFocus={() => {
+                  setIsPlaylistDropdownOpen(true);
+                  // Reset search filter when opening dropdown
+                  setPlaylistSearch('');
+                }}
                 aria-label="Search playlists"
               />
               <button 
                 className={styles.comboboxButton}
-                onClick={() => setIsPlaylistDropdownOpen(!isPlaylistDropdownOpen)}
+                onClick={() => {
+                  const newState = !isPlaylistDropdownOpen;
+                  setIsPlaylistDropdownOpen(newState);
+                  // Reset search filter when opening dropdown
+                  if (newState) {
+                    setPlaylistSearch('');
+                  }
+                }}
                 aria-label="Toggle playlist dropdown"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
