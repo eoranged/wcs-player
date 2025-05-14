@@ -24,9 +24,25 @@
     "noPlaylistsFound": "No playlists found",
     "tempoRange": "Tempo Range"
   },
+  "menu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help"
+  },
   "profile": {
+    "title": "Profile",
     "languageSettings": "Language Settings",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "comingSoon": "Profile features coming soon"
+  },
+  "help": {
+    "title": "Help",
+    "playback": "Playback Controls",
+    "playbackDescription": "Use the play/pause button to control playback. Skip tracks using the next and previous buttons.",
+    "tempo": "Tempo Adjustment",
+    "tempoDescription": "Adjust the playback speed using the tempo slider in the settings panel.",
+    "playlists": "Playlists",
+    "playlistsDescription": "Select different playlists from the settings panel to change the music style."
   },
   "errors": {
     "general": "Something went wrong",

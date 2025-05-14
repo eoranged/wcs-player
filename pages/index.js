@@ -8,6 +8,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import TelegramUser from '../components/TelegramUser';
 import TelegramUserProfile from '../components/TelegramUserProfile';
+import ProfilePanel from '../components/ProfilePanel';
+import HelpPanel from '../components/HelpPanel';
 import ConfigPanel from '../components/ConfigPanel';
 import VersionPanel from '../components/VersionPanel';
 import { captureError, isSentryInitialized } from '../utils/errorReporting';
@@ -29,7 +31,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
-  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [activePanel, setActivePanel] = useState(null); // 'profile', 'settings', 'help', or null
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
 
@@ -207,12 +209,21 @@ export default function Home() {
       <div className="bg-gray-800 rounded-2xl p-4 shadow-2xl flex flex-col overflow-hidden">
         {/* Top user info */}
         <div className="flex justify-end mb-2 -mt-1">
-          <div onClick={() => setShowUserProfile(true)}>
-            <TelegramUser />
-          </div>
+          <TelegramUser onMenuItemClick={(menuItem) => {
+            if (menuItem === 'profile') {
+              setActivePanel('profile');
+              setShowConfigPanel(false);
+            } else if (menuItem === 'settings') {
+              setActivePanel('settings');
+              setShowConfigPanel(false);
+            } else if (menuItem === 'help') {
+              setActivePanel('help');
+              setShowConfigPanel(false);
+            }
+          }} />
         </div>
         
-        {!showConfigPanel && !showUserProfile ? (
+        {!showConfigPanel && !activePanel ? (
           /* Player Content */
           <>
             {/* Album Art */}
@@ -344,12 +355,22 @@ export default function Home() {
             selectedPlaylist={selectedPlaylist}
             onPlaylistChange={setSelectedPlaylist}
           />
-        ) : (
-          /* User Profile Panel */
+        ) : activePanel === 'settings' ? (
+          /* Settings Panel (TelegramUserProfile) */
           <TelegramUserProfile
-            onClose={() => setShowUserProfile(false)}
+            onClose={() => setActivePanel(null)}
           />
-        )}
+        ) : activePanel === 'profile' ? (
+          /* Profile Panel */
+          <ProfilePanel
+            onClose={() => setActivePanel(null)}
+          />
+        ) : activePanel === 'help' ? (
+          /* Help Panel */
+          <HelpPanel
+            onClose={() => setActivePanel(null)}
+          />
+        ) : null}
       </div>
 
       {/* Audio Element */}
