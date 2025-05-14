@@ -1,5 +1,7 @@
 # Telegram Audio Player Mini App
 
+> **IMPORTANT DISCLAIMER:** This project is fully vibe coded as a test project exploring Windsurf and should never be used in production. It is intended solely for experimental and learning purposes.
+
 A modern audio player built as a Telegram Mini App with tempo control, built with Next.js and Tailwind CSS.
 
 ## Features
