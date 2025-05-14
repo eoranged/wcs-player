@@ -128,6 +128,16 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
         
         const data = await response.json();
         setPlaylists(data);
+        
+        // If we don't have a selected playlist yet but have playlists available,
+        // select the first one (only if no playlist is already selected)
+        if (data.length > 0 && !localSelectedPlaylist) {
+          setLocalSelectedPlaylist(data[0]);
+          setPlaylistSearch(data[0].name);
+          if (onPlaylistChange) {
+            onPlaylistChange(data[0]);
+          }
+        }
       } catch (error) {
         console.error('Error fetching playlists:', error);
       } finally {
@@ -136,7 +146,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
     };
     
     fetchPlaylists();
-  }, [musicStyle]);
+  }, [musicStyle, localSelectedPlaylist, onPlaylistChange]);
   
   // Filter playlists based on search term
   const filteredPlaylists = playlists.filter(playlist => 

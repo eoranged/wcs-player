@@ -17,6 +17,7 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
 
   // Use the audio player hook with the songs from state
   // This ensures the hook always has the latest songs
@@ -87,10 +88,33 @@ export default function Home() {
     }
   };
 
-  // Load songs on component mount
+  // Fetch default playlist (West Coast Swing)
+  const fetchDefaultPlaylist = async () => {
+    try {
+      setIsPlaylistsLoading(true);
+      console.log('Fetching default playlist (West Coast Swing)...');
+      
+      const response = await fetch('/api/playlists?style=West%20Coast%20Swing');
+      if (!response.ok) throw new Error('Failed to fetch playlists');
+      
+      const playlists = await response.json();
+      if (playlists && playlists.length > 0) {
+        console.log(`Found ${playlists.length} playlists for West Coast Swing`);
+        setSelectedPlaylist(playlists[0]);
+        console.log(`Selected default playlist: ${playlists[0].name}`);
+      }
+    } catch (error) {
+      console.error('Error fetching default playlist:', error);
+    } finally {
+      setIsPlaylistsLoading(false);
+    }
+  };
+
+  // Load songs and default playlist on component mount
   useEffect(() => {
     console.log('Component mounted, fetching songs from API...');
     fetchSongs();
+    fetchDefaultPlaylist();
   }, []);
   
   // Log initial songs load - only once
@@ -186,9 +210,9 @@ export default function Home() {
               <p className="text-gray-400">{currentSong.artist}</p>
               <p className="text-gray-500 text-sm">{currentSong.album}</p>
               
-              {/* Playlist and Tempo Info */}
-              {(selectedPlaylist || tempoRange) && (
-                <div className="mt-3 pt-2 border-t border-gray-700">
+              {/* Playlist, Tempo Info and Config Button */}
+              <div className="mt-3 pt-2 border-t border-gray-700 relative">
+                <div className="flex flex-col items-center">
                   {selectedPlaylist && (
                     <div className="flex items-center justify-center mb-1">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400 mr-1">
@@ -210,7 +234,20 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-              )}
+                
+                {/* Config Button - Positioned Absolutely */}
+                <button
+                  onClick={() => setShowConfigPanel(true)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 rounded-full hover:bg-gray-700 hover:text-white transition-colors"
+                  title="Settings"
+                  aria-label="Open settings"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             {/* Progress Bar */}
@@ -269,17 +306,6 @@ export default function Home() {
               >
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setShowConfigPanel(true)}
-                className="p-2 text-white rounded-full hover:bg-gray-700 transition-colors"
-                title="Settings"
-                aria-label="Open settings"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                 </svg>
               </button>
             </div>
