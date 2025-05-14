@@ -61,6 +61,14 @@ if (typeof window !== 'undefined' && !consoleOverrideApplied) {
   }, 10000);
 
   consoleOverrideApplied = true;
+  
+  // Log app version and build time as one of the first entries
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || 'dev';
+  const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME 
+    ? new Date(process.env.NEXT_PUBLIC_BUILD_TIME).toLocaleString() 
+    : 'unknown';
+  
+  console.info(`App Version: v${appVersion} | Build Time: ${buildTime}`);
 }
 
 const DebugPanel = ({ onClose }) => {
