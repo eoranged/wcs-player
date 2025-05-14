@@ -1,0 +1,125 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.profileCard {
+  background: linear-gradient(to bottom, #2c3e50, #1a2530);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.profileHeader {
+  padding: 30px 20px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profileAvatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.profileName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 5px;
+  color: white;
+}
+
+.profileUsername {
+  font-size: 1rem;
+  color: #64b5f6;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.profileDetails {
+  padding: 20px;
+}
+
+.profileDetails h3 {
+  font-size: 1.1rem;
+  color: white;
+  margin: 0 0 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.profileFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profileField {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fieldLabel {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fieldValue {
+  color: white;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
