@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/TelegramUserProfile.module.css';
 import { useTelegramContext } from './TelegramUser';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 const TelegramUserProfile = ({ onClose }) => {
   const { user } = useTelegramContext();
-  const [selectedLanguage, setSelectedLanguage] = useState('ru'); // Default to Russian
+  const { t, i18n } = useTranslation('common');
+  const router = useRouter();
+  const [selectedLanguage, setSelectedLanguage] = useState(router.locale || 'ru'); // Default to Russian
 
-  // Set initial language based on user's language code
+  // Set initial language based on router locale or user's language code
   useEffect(() => {
-    if (user?.language_code) {
+    if (router.locale) {
+      setSelectedLanguage(router.locale);
+    } else if (user?.language_code) {
       // Only switch to English if language code is 'en'
       // Otherwise keep Russian as default
       if (user.language_code.toLowerCase() === 'en') {
         setSelectedLanguage('en');
       }
     }
-  }, [user]);
+  }, [user, router.locale]);
 
   if (!user) {
     return null;
@@ -26,9 +32,11 @@ const TelegramUserProfile = ({ onClose }) => {
     { code: 'ru', name: 'Русский', flag: '🇷🇺' }
   ];
 
-  const handleLanguageChange = (langCode) => {
+  const handleLanguageChange = async (langCode) => {
     setSelectedLanguage(langCode);
-    // Here you would typically save the language preference
+    // Change the language in i18n and router
+    await i18n.changeLanguage(langCode);
+    router.push(router.pathname, router.asPath, { locale: langCode });
     console.log(`Language changed to: ${langCode}`);
   };
 
@@ -39,7 +47,7 @@ const TelegramUserProfile = ({ onClose }) => {
         <button 
           onClick={onClose}
           className={styles.backButton}
-          aria-label="Back to player"
+          aria-label={t('controls.back')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5"></path>
@@ -69,7 +77,7 @@ const TelegramUserProfile = ({ onClose }) => {
       
       {/* Language selector */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Select Language</h3>
+        <h3 className={styles.sectionTitle}>{t('profile.selectLanguage')}</h3>
         <div className={styles.languageSelector}>
           {languages.map((language) => (
             <div 

@@ -1,0 +1,39 @@
+{
+  "player": {
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next track",
+    "previous": "Previous track",
+    "loading": "Loading...",
+    "error": "Error loading track",
+    "noTracks": "No tracks available"
+  },
+  "controls": {
+    "settings": "Settings",
+    "back": "Back to player",
+    "tempoControl": "Tempo Control",
+    "currentTempo": "Current tempo",
+    "resetTempo": "Reset tempo"
+  },
+  "config": {
+    "title": "Settings",
+    "musicStyle": "Music Style",
+    "playlists": "Playlists",
+    "searchPlaylists": "Search playlists...",
+    "loadingPlaylists": "Loading playlists...",
+    "noPlaylistsFound": "No playlists found",
+    "tempoRange": "Tempo Range"
+  },
+  "profile": {
+    "languageSettings": "Language Settings",
+    "selectLanguage": "Select Language"
+  },
+  "errors": {
+    "general": "Something went wrong",
+    "retry": "Retry",
+    "loadingFailed": "Failed to load data"
+  },
+  "misc": {
+    "version": "Version"
+  }
+}

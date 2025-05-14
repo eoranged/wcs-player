@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from '../styles/ConfigPanel.module.css';
 import { useDebounce } from '../hooks/useDebounce';
+import { useTranslation } from 'next-i18next';
 
 const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist, onPlaylistChange }) => {
+  const { t } = useTranslation('common');
   const [localRange, setLocalRange] = useState(tempoRange);
   const [musicStyle, setMusicStyle] = useState('West Coast Swing');
   const [playlistSearch, setPlaylistSearch] = useState(selectedPlaylist ? selectedPlaylist.name : '');
@@ -213,8 +215,8 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
         <button 
           onClick={onClose} 
           className={styles.backButton} 
-          title="Back to player"
-          aria-label="Back to player"
+          title={t('controls.back')}
+          aria-label={t('controls.back')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5"></path>
@@ -226,7 +228,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
       
       <div className={styles.configContent}>
         <div className={styles.configSection}>
-          <h4>Music Style</h4>
+          <h4>{t('config.musicStyle')}</h4>
           <div className={styles.selectContainer}>
             <select 
               className={styles.select}
@@ -243,14 +245,14 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
         </div>
         
         <div className={styles.configSection}>
-          <h4>Playlist</h4>
+          <h4>{t('config.playlists')}</h4>
           <div className={styles.comboboxContainer}>
             <div className={styles.inputContainer}>
               <input
                 ref={playlistInputRef}
                 type="text"
                 className={styles.comboboxInput}
-                placeholder="Search playlists..."
+                placeholder={t('config.searchPlaylists')}
                 value={playlistSearch}
                 onChange={(e) => setPlaylistSearch(e.target.value)}
                 onFocus={() => {
@@ -281,7 +283,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
             {isPlaylistDropdownOpen && (
               <div className={styles.comboboxDropdown} ref={playlistDropdownRef}>
                 {isPlaylistsLoading ? (
-                  <div className={styles.loadingItem}>Loading playlists...</div>
+                  <div className={styles.loadingItem}>{t('config.loadingPlaylists')}</div>
                 ) : filteredPlaylists.length > 0 ? (
                   filteredPlaylists.map(playlist => (
                     <div 
@@ -298,7 +300,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
                     </div>
                   ))
                 ) : (
-                  <div className={styles.emptyItem}>No playlists found</div>
+                  <div className={styles.emptyItem}>{t('config.noPlaylistsFound')}</div>
                 )}
               </div>
             )}
@@ -313,7 +315,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
         </div>
         
         <div className={styles.configSection}>
-          <h4>Tempo Range</h4>
+          <h4>{t('config.tempoRange')}</h4>
           
           <div className={styles.tempoRangeSlider}>
             {/* Background track */}

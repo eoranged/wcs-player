@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 
-// Import the Sentry webpack plugin
+// Import the Sentry webpack plugin and i18n config
 const { withSentryConfig } = require('@sentry/nextjs');
+const { i18n } = require('./next-i18next.config.js');
 
 // Base configuration
 const baseConfig = {
@@ -12,6 +13,7 @@ const baseConfig = {
   },
   basePath: '',
   trailingSlash: true,
+  i18n,
 };
 
 // Development configuration

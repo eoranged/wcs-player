@@ -1,0 +1,39 @@
+{
+  "player": {
+    "play": "Воспроизвести",
+    "pause": "Пауза",
+    "next": "Следующий трек",
+    "previous": "Предыдущий трек",
+    "loading": "Загрузка...",
+    "error": "Ошибка загрузки трека",
+    "noTracks": "Нет доступных треков"
+  },
+  "controls": {
+    "settings": "Настройки",
+    "back": "Вернуться к плееру",
+    "tempoControl": "Управление темпом",
+    "currentTempo": "Текущий темп",
+    "resetTempo": "Сбросить темп"
+  },
+  "config": {
+    "title": "Настройки",
+    "musicStyle": "Музыкальный стиль",
+    "playlists": "Плейлисты",
+    "searchPlaylists": "Поиск плейлистов...",
+    "loadingPlaylists": "Загрузка плейлистов...",
+    "noPlaylistsFound": "Плейлисты не найдены",
+    "tempoRange": "Диапазон темпа"
+  },
+  "profile": {
+    "languageSettings": "Настройки языка",
+    "selectLanguage": "Выберите язык"
+  },
+  "errors": {
+    "general": "Что-то пошло не так",
+    "retry": "Повторить",
+    "loadingFailed": "Не удалось загрузить данные"
+  },
+  "misc": {
+    "version": "Версия"
+  }
+}

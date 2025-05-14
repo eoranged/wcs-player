@@ -11,8 +11,19 @@ import TelegramUserProfile from '../components/TelegramUserProfile';
 import ConfigPanel from '../components/ConfigPanel';
 import VersionPanel from '../components/VersionPanel';
 import { captureError, isSentryInitialized } from '../utils/errorReporting';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
 
 export default function Home() {
+  const { t } = useTranslation('common');
   // Initialize with empty array - songs will be fetched from API
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

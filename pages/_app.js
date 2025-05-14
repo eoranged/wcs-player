@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Script from 'next/script';
 import Layout from '../components/Layout';
 import { TelegramProvider } from '../components/TelegramUser';
+import { appWithTranslation } from 'next-i18next';
 
 function MyApp({ Component, pageProps }) {
   const [isClient, setIsClient] = useState(false);
@@ -69,4 +70,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default MyApp;
+export default appWithTranslation(MyApp);
