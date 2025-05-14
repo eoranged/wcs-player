@@ -1,0 +1,59 @@
+{
+  "id": "bachata_sensual",
+  "name": "Bachata Sensual",
+  "style": "Bachata",
+  "minTempo": 80,
+  "maxTempo": 110,
+  "songs": [
+    {
+      "id": "bach_sens_1",
+      "title": "Creep",
+      "artist": "Daniel Santacruz",
+      "album": "Bachata Hits",
+      "tempo": 85,
+      "duration": 228,
+      "cover": "https://placehold.co/512x512?text=Creep+Bachata",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"
+    },
+    {
+      "id": "bach_sens_2",
+      "title": "Stand By Me",
+      "artist": "Prince Royce",
+      "album": "Prince Royce",
+      "tempo": 90,
+      "duration": 217,
+      "cover": "https://placehold.co/512x512?text=Stand+By+Me",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3"
+    },
+    {
+      "id": "bach_sens_3",
+      "title": "Te Extraño",
+      "artist": "Xtreme",
+      "album": "Xtreme",
+      "tempo": 95,
+      "duration": 240,
+      "cover": "https://placehold.co/512x512?text=Te+Extrano",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
+    },
+    {
+      "id": "bach_sens_4",
+      "title": "Me Emborracharé",
+      "artist": "Grupo Extra",
+      "album": "The One",
+      "tempo": 100,
+      "duration": 235,
+      "cover": "https://placehold.co/512x512?text=Me+Emborrachare",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3"
+    },
+    {
+      "id": "bach_sens_5",
+      "title": "Culpa Al Corazón",
+      "artist": "Prince Royce",
+      "album": "Five",
+      "tempo": 105,
+      "duration": 220,
+      "cover": "https://placehold.co/512x512?text=Culpa+Al+Corazon",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"
+    }
+  ]
+}

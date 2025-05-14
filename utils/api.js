@@ -1,30 +1,14 @@
 /**
- * Fetches data from the API with error handling
- * @param {string} endpoint - The API endpoint to fetch from
- * @param {Object} options - Fetch options
+ * Fetches data from local JSON files instead of API
+ * @param {string} path - The path to the JSON file
  * @returns {Promise<Object>} - The parsed JSON response
  * @throws {Error} - If the request fails
  */
-export const fetchFromApi = async (endpoint, options = {}) => {
+export const fetchLocalJson = async (path) => {
   try {
-    // Ensure endpoint has trailing slash to prevent redirects
-    // Next.js with trailingSlash: true in config requires endpoints to end with /
-    const normalizedEndpoint = endpoint.endsWith('/') ? endpoint : `${endpoint}/`;
+    console.log(`Fetching local JSON file: ${path}`);
     
-    console.log(`Fetching from API: /api/${normalizedEndpoint}`);
-    
-    // Use the normalized endpoint with trailing slash
-    const response = await fetch(`/api/${normalizedEndpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      // Redirect: follow ensures any redirects are followed automatically
-      redirect: 'follow',
-      ...options,
-    });
-
-    console.log(`API response status:`, response.status, response.statusText);
+    const response = await fetch(path);
     
     if (!response.ok) {
       const error = new Error(`HTTP error! status: ${response.status}`);
@@ -32,60 +16,106 @@ export const fetchFromApi = async (endpoint, options = {}) => {
       throw error;
     }
 
-    // Clone the response before parsing to avoid consuming it
-    const clonedResponse = response.clone();
-    
-    try {
-      const data = await response.json();
-      console.log(`API response data:`, data);
-      return data;
-    } catch (parseError) {
-      console.error(`Error parsing JSON from ${normalizedEndpoint}:`, parseError);
-      
-      // Try to get the raw text to see what's being returned
-      const text = await clonedResponse.text();
-      console.log(`Raw API response:`, text);
-      throw new Error(`Failed to parse JSON: ${parseError.message}`);
-    }
+    const data = await response.json();
+    console.log(`Local JSON data loaded:`, data);
+    return data;
   } catch (error) {
-    console.error(`Error fetching from ${endpoint}:`, error);
+    console.error(`Error fetching local JSON from ${path}:`, error);
     throw error;
   }
 };
 
 /**
- * Fetches the music library
+ * Fetches the music library for a specific playlist
+ * @param {string} playlistId - The ID of the playlist to fetch songs for
  * @returns {Promise<Array>} - The music library data
  */
-export const fetchMusicLibrary = async () => {
+export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
   try {
-    console.log('Fetching music library...');
+    console.log(`Fetching music library for playlist: ${playlistId}`);
     
-    // Use 'music' endpoint (fetchFromApi will add trailing slash)
-    const data = await fetchFromApi('music');
+    // Use local JSON file for the playlist
+    const data = await fetchLocalJson(`/playlists/${playlistId}.json`);
     
     // Validate the data structure
-    if (!data) {
+    if (!data || !data.songs) {
       console.error('Music library data is null or undefined');
       throw new Error('Invalid music library data: null or undefined');
     }
     
-    if (!Array.isArray(data)) {
-      console.error('Music library data is not an array:', typeof data, data);
-      throw new Error(`Invalid music library data: expected array, got ${typeof data}`);
+    if (!Array.isArray(data.songs)) {
+      console.error('Music library songs is not an array:', typeof data.songs, data.songs);
+      throw new Error(`Invalid music library data: expected array, got ${typeof data.songs}`);
     }
     
-    if (data.length === 0) {
+    if (data.songs.length === 0) {
       console.warn('Music library is empty (0 songs)');
     } else {
-      console.log(`Successfully fetched music library with ${data.length} songs:`);
+      console.log(`Successfully fetched music library with ${data.songs.length} songs:`);
       // Log the first song to verify structure
-      console.log('First song:', data[0]);
+      console.log('First song:', data.songs[0]);
     }
     
-    return data;
+    return data.songs;
   } catch (error) {
     console.error('Failed to fetch music library:', error);
     throw error;
+  }
+};
+
+/**
+ * Fetches available music styles
+ * @returns {Promise<Array>} - The available music styles
+ */
+export const fetchMusicStyles = async () => {
+  try {
+    console.log('Fetching available music styles...');
+    
+    // For simplicity, we'll hardcode the available styles
+    // In a real app, you might want to scan the styles directory
+    const styles = [
+      'West Coast Swing',
+      'Bachata',
+      'Salsa'
+    ];
+    
+    return styles;
+  } catch (error) {
+    console.error('Failed to fetch music styles:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches playlists for a specific music style
+ * @param {string} style - The music style to fetch playlists for
+ * @returns {Promise<Array>} - The playlists data
+ */
+export const fetchPlaylists = async (style = 'West Coast Swing') => {
+  try {
+    console.log(`Fetching playlists for style: ${style}`);
+    
+    // Convert style name to filename format
+    const styleFileName = style.toLowerCase().replace(/ /g, '_');
+    
+    // Use local JSON file for the style
+    const data = await fetchLocalJson(`/styles/${styleFileName}.json`);
+    
+    // Validate the data structure
+    if (!data || !data.playlists) {
+      console.error('Playlists data is null or undefined');
+      throw new Error('Invalid playlists data: null or undefined');
+    }
+    
+    if (!Array.isArray(data.playlists)) {
+      console.error('Playlists is not an array:', typeof data.playlists, data.playlists);
+      throw new Error(`Invalid playlists data: expected array, got ${typeof data.playlists}`);
+    }
+    
+    return data.playlists;
+  } catch (error) {
+    console.error(`Failed to fetch playlists for style ${style}:`, error);
+    // Return empty array instead of throwing to make the UI more resilient
+    return [];
   }
 };

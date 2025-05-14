@@ -19,7 +19,7 @@ if (SENTRY_DSN) {
     // Optional: Set a release version
     release: process.env.NEXT_PUBLIC_APP_VERSION || 'development',
     integrations: [
-      // Enable server profiling integration for Next.js 15
+      // Enable server profiling integration
       new ProfilingIntegration(),
     ],
   });

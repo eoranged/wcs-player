@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useTempoSlider } from '../hooks/useTempoSlider';
-import { fetchMusicLibrary } from '../utils/api';
+import { fetchMusicLibrary, fetchPlaylists } from '../utils/api';
 import ProgressBar from '../components/ProgressBar';
 import Icon from '../components/Icon';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -73,25 +73,50 @@ export default function Home() {
     }
   }, [audioRef, setAudioRef]);
 
-  // Fetch songs from the API
-  const fetchSongs = async () => {
+  // Filter songs by tempo range
+  const filterSongsByTempo = (songs, range) => {
+    if (!songs || !Array.isArray(songs) || songs.length === 0) {
+      return [];
+    }
+    
+    // Filter songs to only include those within the tempo range
+    return songs.filter(song => {
+      const tempo = song.tempo;
+      return tempo >= range.min && tempo <= range.max;
+    });
+  };
+  
+  // Fetch songs from local JSON files and filter by tempo range
+  const fetchSongs = async (playlistId = 'wcs_beginner') => {
     try {
       setIsLoading(true);
-      console.log('Fetching music library from API...');
+      console.log(`Fetching songs for playlist: ${playlistId}...`);
       
-      // Use the fixed fetchMusicLibrary utility which handles trailing slashes
-      const data = await fetchMusicLibrary();
+      // Use the fetchMusicLibrary utility which now loads from local JSON files
+      const data = await fetchMusicLibrary(playlistId);
       
       // Check if we got valid data
       if (data && Array.isArray(data) && data.length > 0) {
-        console.log(`Setting songs state with ${data.length} songs from API`);
-        setSongs(data);
-        setError(null);
-        return data;
+        console.log(`Fetched ${data.length} songs from local JSON`);
+        
+        // Filter songs by tempo range
+        const filteredSongs = filterSongsByTempo(data, tempoRange);
+        console.log(`Filtered to ${filteredSongs.length} songs within tempo range ${tempoRange.min}-${tempoRange.max} BPM`);
+        
+        if (filteredSongs.length > 0) {
+          setSongs(filteredSongs);
+          setError(null);
+          return filteredSongs;
+        } else {
+          // If no songs match the tempo range, show all songs but display a warning
+          setSongs(data);
+          setError(`No songs match the current tempo range (${tempoRange.min}-${tempoRange.max} BPM). Showing all songs.`);
+          return data;
+        }
       } else {
-        console.error('API returned empty or invalid data');
+        console.error('No songs found in the playlist');
         setSongs([]);
-        setError('No songs available. The API returned empty data.');
+        setError('No songs available in this playlist.');
         return [];
       }
     } catch (error) {
@@ -110,14 +135,14 @@ export default function Home() {
       setIsPlaylistsLoading(true);
       console.log('Fetching default playlist (West Coast Swing)...');
       
-      const response = await fetch('/api/playlists?style=West%20Coast%20Swing');
-      if (!response.ok) throw new Error('Failed to fetch playlists');
-      
-      const playlists = await response.json();
+      const playlists = await fetchPlaylists('West Coast Swing');
       if (playlists && playlists.length > 0) {
         console.log(`Found ${playlists.length} playlists for West Coast Swing`);
         setSelectedPlaylist(playlists[0]);
         console.log(`Selected default playlist: ${playlists[0].name}`);
+        
+        // Load songs for the default playlist
+        await fetchSongs(playlists[0].id);
       }
     } catch (error) {
       console.error('Error fetching default playlist:', error);
@@ -146,6 +171,15 @@ export default function Home() {
     }
   }, [songs.length > 0]); // This will only run once when songs are first loaded
 
+  // Re-filter songs when tempo range changes
+  useEffect(() => {
+    // Skip on initial render
+    if (songs.length > 0 && selectedPlaylist) {
+      console.log(`Tempo range changed to ${tempoRange.min}-${tempoRange.max} BPM, re-filtering songs...`);
+      fetchSongs(selectedPlaylist.id);
+    }
+  }, [tempoRange]);
+  
   // Initialize player when songs are first loaded
   useEffect(() => {
     // Only run this effect when songs array changes
@@ -353,7 +387,11 @@ export default function Home() {
             tempoRange={tempoRange}
             onTempoRangeChange={setTempoRange}
             selectedPlaylist={selectedPlaylist}
-            onPlaylistChange={setSelectedPlaylist}
+            onPlaylistChange={(playlist) => {
+              setSelectedPlaylist(playlist);
+              // Fetch songs for the selected playlist
+              fetchSongs(playlist.id);
+            }}
           />
         ) : activePanel === 'settings' ? (
           /* Settings Panel (TelegramUserProfile) */

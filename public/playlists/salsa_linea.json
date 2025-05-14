@@ -1,0 +1,59 @@
+{
+  "id": "salsa_linea",
+  "name": "Salsa en Línea",
+  "style": "Salsa",
+  "minTempo": 100,
+  "maxTempo": 140,
+  "songs": [
+    {
+      "id": "salsa_lin_1",
+      "title": "Vivir Mi Vida",
+      "artist": "Marc Anthony",
+      "album": "3.0",
+      "tempo": 120,
+      "duration": 243,
+      "cover": "https://placehold.co/512x512?text=Vivir+Mi+Vida",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
+    },
+    {
+      "id": "salsa_lin_2",
+      "title": "Danza Kuduro",
+      "artist": "Don Omar ft. Lucenzo",
+      "album": "Meet the Orphans",
+      "tempo": 130,
+      "duration": 205,
+      "cover": "https://placehold.co/512x512?text=Danza+Kuduro",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"
+    },
+    {
+      "id": "salsa_lin_3",
+      "title": "Llorarás",
+      "artist": "Oscar D'León",
+      "album": "Oscar D'León",
+      "tempo": 125,
+      "duration": 285,
+      "cover": "https://placehold.co/512x512?text=Lloraras",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+    },
+    {
+      "id": "salsa_lin_4",
+      "title": "Valió La Pena",
+      "artist": "Marc Anthony",
+      "album": "Valió La Pena",
+      "tempo": 135,
+      "duration": 264,
+      "cover": "https://placehold.co/512x512?text=Valio+La+Pena",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
+    },
+    {
+      "id": "salsa_lin_5",
+      "title": "La Vida Es Un Carnaval",
+      "artist": "Celia Cruz",
+      "album": "Mi Vida Es Cantar",
+      "tempo": 140,
+      "duration": 270,
+      "cover": "https://placehold.co/512x512?text=La+Vida+Es+Un+Carnaval",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
+    }
+  ]
+}

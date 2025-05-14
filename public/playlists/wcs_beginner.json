@@ -1,0 +1,59 @@
+{
+  "id": "wcs_beginner",
+  "name": "WCS Beginner",
+  "style": "West Coast Swing",
+  "minTempo": 80,
+  "maxTempo": 110,
+  "songs": [
+    {
+      "id": "wcs_beg_1",
+      "title": "Thinking Out Loud",
+      "artist": "Ed Sheeran",
+      "album": "X",
+      "tempo": 85,
+      "duration": 281,
+      "cover": "https://placehold.co/512x512?text=Thinking+Out+Loud",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    },
+    {
+      "id": "wcs_beg_2",
+      "title": "All of Me",
+      "artist": "John Legend",
+      "album": "Love in the Future",
+      "tempo": 90,
+      "duration": 270,
+      "cover": "https://placehold.co/512x512?text=All+Of+Me",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    },
+    {
+      "id": "wcs_beg_3",
+      "title": "Stay With Me",
+      "artist": "Sam Smith",
+      "album": "In the Lonely Hour",
+      "tempo": 95,
+      "duration": 172,
+      "cover": "https://placehold.co/512x512?text=Stay+With+Me",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+    },
+    {
+      "id": "wcs_beg_4",
+      "title": "Mercy",
+      "artist": "Duffy",
+      "album": "Rockferry",
+      "tempo": 100,
+      "duration": 220,
+      "cover": "https://placehold.co/512x512?text=Mercy",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+    },
+    {
+      "id": "wcs_beg_5",
+      "title": "Treasure",
+      "artist": "Bruno Mars",
+      "album": "Unorthodox Jukebox",
+      "tempo": 108,
+      "duration": 178,
+      "cover": "https://placehold.co/512x512?text=Treasure",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"
+    }
+  ]
+}

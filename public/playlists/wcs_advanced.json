@@ -1,0 +1,59 @@
+{
+  "id": "wcs_advanced",
+  "name": "WCS Advanced",
+  "style": "West Coast Swing",
+  "minTempo": 110,
+  "maxTempo": 140,
+  "songs": [
+    {
+      "id": "wcs_adv_1",
+      "title": "24K Magic",
+      "artist": "Bruno Mars",
+      "album": "24K Magic",
+      "tempo": 125,
+      "duration": 226,
+      "cover": "https://placehold.co/512x512?text=24K+Magic",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"
+    },
+    {
+      "id": "wcs_adv_2",
+      "title": "Don't Start Now",
+      "artist": "Dua Lipa",
+      "album": "Future Nostalgia",
+      "tempo": 124,
+      "duration": 183,
+      "cover": "https://placehold.co/512x512?text=Don't+Start+Now",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3"
+    },
+    {
+      "id": "wcs_adv_3",
+      "title": "Juice",
+      "artist": "Lizzo",
+      "album": "Cuz I Love You",
+      "tempo": 130,
+      "duration": 215,
+      "cover": "https://placehold.co/512x512?text=Juice",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
+    },
+    {
+      "id": "wcs_adv_4",
+      "title": "Levitating",
+      "artist": "Dua Lipa ft. DaBaby",
+      "album": "Future Nostalgia",
+      "tempo": 135,
+      "duration": 203,
+      "cover": "https://placehold.co/512x512?text=Levitating",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3"
+    },
+    {
+      "id": "wcs_adv_5",
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "album": "After Hours",
+      "tempo": 138,
+      "duration": 200,
+      "cover": "https://placehold.co/512x512?text=Blinding+Lights",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"
+    }
+  ]
+}

@@ -5,20 +5,14 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const { i18n } = require('./next-i18next.config.js');
 
 // Base configuration
-const baseConfig = {
+const nextConfig = {
   reactStrictMode: true,
-  // swcMinify is now enabled by default in Next.js 15
   images: {
     unoptimized: true,
   },
   basePath: '',
   trailingSlash: true,
   i18n,
-};
-
-// Development configuration
-const devConfig = {
-  ...baseConfig,
   async rewrites() {
     return [
       {
@@ -27,39 +21,27 @@ const devConfig = {
       },
     ];
   },
-};
-
-// Production configuration
-const prodConfig = {
-  ...baseConfig,
-  // Next.js 15 recommended configuration
-  skipTrailingSlashRedirect: true,
-  // Use modern exportPathMap syntax
-  exportPathMap: async function() {
-    return {
-      '/': { page: '/' },
-    };
+  webpack: (config, { isServer }) => {
+    // Suppress critical dependency warnings
+    config.ignoreWarnings = [
+      { module: /@opentelemetry/ },
+      { module: /@prisma\/instrumentation/ },
+      { message: /Critical dependency: the request of a dependency is an expression/ },
+    ];
+    return config;
   },
 };
 
-// Use different config based on environment
-const nextConfig = process.env.NODE_ENV === 'development' ? devConfig : prodConfig;
-
-// Sentry configuration for Next.js 15
+// Sentry configuration for Next.js
 const sentryWebpackPluginOptions = {
-  // Additional config options for the Sentry webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
   silent: true, // Suppresses all logs
-  // Next.js 15 specific options
-  widenClientFileUpload: true,
-  transpileClientSDK: true,
-  tunnelRoute: '/monitoring',
-  hideSourceMaps: true,
-  disableServerWebpackPlugin: false,
-  disableClientWebpackPlugin: false,
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+  
+  // Prevents the Sentry plugin from creating source maps
+  // This helps avoid the critical dependency warnings
+  disableServerWebpackPlugin: true,
+  disableClientWebpackPlugin: true,
 };
 
 // Check if SENTRY_DSN is set

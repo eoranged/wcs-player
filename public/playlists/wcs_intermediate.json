@@ -1,0 +1,59 @@
+{
+  "id": "wcs_intermediate",
+  "name": "WCS Intermediate",
+  "style": "West Coast Swing",
+  "minTempo": 100,
+  "maxTempo": 120,
+  "songs": [
+    {
+      "id": "wcs_int_1",
+      "title": "Uptown Funk",
+      "artist": "Mark Ronson ft. Bruno Mars",
+      "album": "Uptown Special",
+      "tempo": 115,
+      "duration": 270,
+      "cover": "https://placehold.co/512x512?text=Uptown+Funk",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
+    },
+    {
+      "id": "wcs_int_2",
+      "title": "Can't Feel My Face",
+      "artist": "The Weeknd",
+      "album": "Beauty Behind the Madness",
+      "tempo": 108,
+      "duration": 213,
+      "cover": "https://placehold.co/512x512?text=Can't+Feel+My+Face",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"
+    },
+    {
+      "id": "wcs_int_3",
+      "title": "Love On Top",
+      "artist": "Beyoncé",
+      "album": "4",
+      "tempo": 105,
+      "duration": 267,
+      "cover": "https://placehold.co/512x512?text=Love+On+Top",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+    },
+    {
+      "id": "wcs_int_4",
+      "title": "Blurred Lines",
+      "artist": "Robin Thicke ft. T.I., Pharrell",
+      "album": "Blurred Lines",
+      "tempo": 120,
+      "duration": 264,
+      "cover": "https://placehold.co/512x512?text=Blurred+Lines",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
+    },
+    {
+      "id": "wcs_int_5",
+      "title": "Moves Like Jagger",
+      "artist": "Maroon 5 ft. Christina Aguilera",
+      "album": "Hands All Over",
+      "tempo": 118,
+      "duration": 201,
+      "cover": "https://placehold.co/512x512?text=Moves+Like+Jagger",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
+    }
+  ]
+}

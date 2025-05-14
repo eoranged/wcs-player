@@ -1,17 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from '../styles/ConfigPanel.module.css';
 import { useDebounce } from '../hooks/useDebounce';
 import { useTranslation } from 'next-i18next';
+import { fetchPlaylists } from '../utils/api';
 
 const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist, onPlaylistChange }) => {
   const { t } = useTranslation('common');
-  const [localRange, setLocalRange] = useState(tempoRange);
+  
+  // State initialization with memoized initial values to prevent re-renders
+  const initialRange = useRef(tempoRange).current;
+  const initialPlaylist = useRef(selectedPlaylist).current;
+  
+  const [localRange, setLocalRange] = useState(initialRange);
   const [musicStyle, setMusicStyle] = useState('West Coast Swing');
-  const [playlistSearch, setPlaylistSearch] = useState(selectedPlaylist ? selectedPlaylist.name : '');
+  const [playlistSearch, setPlaylistSearch] = useState(initialPlaylist ? initialPlaylist.name : '');
   const [playlists, setPlaylists] = useState([]);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
-  const [localSelectedPlaylist, setLocalSelectedPlaylist] = useState(selectedPlaylist);
+  const [localSelectedPlaylist, setLocalSelectedPlaylist] = useState(initialPlaylist);
   const [isPlaylistDropdownOpen, setIsPlaylistDropdownOpen] = useState(false);
+  
+  // Refs for UI elements and interaction tracking
+  const playlistChangeRef = useRef(false);
+  const rangeChangeRef = useRef(false);
   
   const debouncedSearch = useDebounce(playlistSearch, 300);
   const trackRef = useRef(null);
@@ -100,6 +110,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
 
   // Update tempo value with constraints
   const updateTempoValue = (thumb, value) => {
+    rangeChangeRef.current = true;
     setLocalRange(prev => {
       let newRange;
       if (thumb === 'min') {
@@ -114,59 +125,73 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
         newRange = prev;
       }
       
+      console.log('ConfigPanel: Updating tempo range:', newRange);
       return newRange;
     });
   };
 
-  // Fetch playlists when music style changes or search term is updated
-  useEffect(() => {
-    const fetchPlaylists = async () => {
-      if (!musicStyle) return;
-      
-      setIsPlaylistsLoading(true);
-      try {
-        const response = await fetch(`/api/playlists?style=${encodeURIComponent(musicStyle)}`);
-        if (!response.ok) throw new Error('Failed to fetch playlists');
-        
-        const data = await response.json();
-        setPlaylists(data);
-        
-        // If we don't have a selected playlist yet but have playlists available,
-        // select the first one (only if no playlist is already selected)
-        if (data.length > 0 && !localSelectedPlaylist) {
-          setLocalSelectedPlaylist(data[0]);
-          setPlaylistSearch(data[0].name);
-          if (onPlaylistChange) {
-            onPlaylistChange(data[0]);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching playlists:', error);
-      } finally {
-        setIsPlaylistsLoading(false);
-      }
-    };
+  // Load playlists only when music style changes
+  const loadPlaylists = useCallback(async () => {
+    if (!musicStyle) return;
     
-    fetchPlaylists();
-  }, [musicStyle, localSelectedPlaylist, onPlaylistChange]);
+    setIsPlaylistsLoading(true);
+    try {
+      console.log(`ConfigPanel: Loading playlists for ${musicStyle}`);
+      const data = await fetchPlaylists(musicStyle);
+      setPlaylists(data);
+      
+      // Only select first playlist if we don't have one selected yet
+      if (data.length > 0 && !localSelectedPlaylist && !initialPlaylist) {
+        console.log('ConfigPanel: Setting initial playlist selection');
+        const firstPlaylist = data[0];
+        setLocalSelectedPlaylist(firstPlaylist);
+        setPlaylistSearch(firstPlaylist.name);
+        playlistChangeRef.current = true;
+      }
+    } catch (error) {
+      console.error('Error fetching playlists:', error);
+    } finally {
+      setIsPlaylistsLoading(false);
+    }
+  }, [musicStyle, initialPlaylist, localSelectedPlaylist]);
   
-  // Filter playlists based on search term
-  const filteredPlaylists = playlists.filter(playlist => 
-    playlist.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    playlist.description.toLowerCase().includes(debouncedSearch.toLowerCase())
-  );
-  
-  // Update parent component when local selected playlist changes
+  // Load playlists when music style changes
   useEffect(() => {
-    if (onPlaylistChange && localSelectedPlaylist) {
+    loadPlaylists();
+  }, [musicStyle, loadPlaylists]);
+  
+  // Filter playlists based on search term and tempo range
+  const filteredPlaylists = playlists.filter(playlist => {
+    // First check if the playlist name or description matches the search term
+    const matchesSearch = 
+      playlist.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      playlist.description.toLowerCase().includes(debouncedSearch.toLowerCase());
+    
+    // Then check if the playlist's tempo range overlaps with the selected tempo range
+    // A playlist is excluded only if it's completely outside the selected range
+    const matchesTempo = 
+      !(playlist.tempoMax < localRange.min || playlist.tempoMin > localRange.max);
+    
+    return matchesSearch && matchesTempo;
+  });
+  
+  // Notify parent component when playlist changes, but only when needed
+  useEffect(() => {
+    // Only call onPlaylistChange if the playlist was changed by user interaction
+    if (playlistChangeRef.current && onPlaylistChange && localSelectedPlaylist) {
+      console.log('ConfigPanel: Notifying parent of playlist change:', localSelectedPlaylist.name);
       onPlaylistChange(localSelectedPlaylist);
+      playlistChangeRef.current = false;
     }
   }, [localSelectedPlaylist, onPlaylistChange]);
   
   // Update parent component when tempo range changes
   useEffect(() => {
-    if (onTempoRangeChange) {
+    // Only call onTempoRangeChange if the range was changed by user interaction
+    if (rangeChangeRef.current && onTempoRangeChange) {
+      console.log('ConfigPanel: Notifying parent of tempo range change:', localRange);
       onTempoRangeChange(localRange);
+      rangeChangeRef.current = false;
     }
   }, [localRange, onTempoRangeChange]);
   
@@ -227,6 +252,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
       </div>
       
       <div className={styles.configContent}>
+        {/* Music Style Section */}
         <div className={styles.configSection}>
           <h4>{t('config.musicStyle')}</h4>
           <div className={styles.selectContainer}>
@@ -244,76 +270,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
           </div>
         </div>
         
-        <div className={styles.configSection}>
-          <h4>{t('config.playlists')}</h4>
-          <div className={styles.comboboxContainer}>
-            <div className={styles.inputContainer}>
-              <input
-                ref={playlistInputRef}
-                type="text"
-                className={styles.comboboxInput}
-                placeholder={t('config.searchPlaylists')}
-                value={playlistSearch}
-                onChange={(e) => setPlaylistSearch(e.target.value)}
-                onFocus={() => {
-                  setIsPlaylistDropdownOpen(true);
-                  // Reset search filter when opening dropdown
-                  setPlaylistSearch('');
-                }}
-                aria-label="Search playlists"
-              />
-              <button 
-                className={styles.comboboxButton}
-                onClick={() => {
-                  const newState = !isPlaylistDropdownOpen;
-                  setIsPlaylistDropdownOpen(newState);
-                  // Reset search filter when opening dropdown
-                  if (newState) {
-                    setPlaylistSearch('');
-                  }
-                }}
-                aria-label="Toggle playlist dropdown"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </button>
-            </div>
-            
-            {isPlaylistDropdownOpen && (
-              <div className={styles.comboboxDropdown} ref={playlistDropdownRef}>
-                {isPlaylistsLoading ? (
-                  <div className={styles.loadingItem}>{t('config.loadingPlaylists')}</div>
-                ) : filteredPlaylists.length > 0 ? (
-                  filteredPlaylists.map(playlist => (
-                    <div 
-                      key={playlist.id}
-                      className={styles.comboboxItem}
-                      onClick={() => {
-                        setLocalSelectedPlaylist(playlist);
-                        setPlaylistSearch(playlist.name);
-                        setIsPlaylistDropdownOpen(false);
-                      }}
-                    >
-                      <div className={styles.comboboxItemName}>{playlist.name}</div>
-                      <div className={styles.comboboxItemDescription}>{playlist.description}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.emptyItem}>{t('config.noPlaylistsFound')}</div>
-                )}
-              </div>
-            )}
-          </div>
-          
-          {localSelectedPlaylist && (
-            <div className={styles.selectedPlaylist}>
-              <div className={styles.selectedPlaylistName}>{localSelectedPlaylist.name}</div>
-              <div className={styles.selectedPlaylistDescription}>{localSelectedPlaylist.description}</div>
-            </div>
-          )}
-        </div>
-        
+        {/* Tempo Range Section - Placed right after style selection */}
         <div className={styles.configSection}>
           <h4>{t('config.tempoRange')}</h4>
           
@@ -375,6 +332,79 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
               />
             </div>
           </div>
+        </div>
+        
+        {/* Playlists Section - Now comes after tempo range */}
+        <div className={styles.configSection}>
+          <h4>{t('config.playlists')}</h4>
+          <div className={styles.comboboxContainer}>
+            <div className={styles.inputContainer}>
+              <input
+                ref={playlistInputRef}
+                type="text"
+                className={styles.comboboxInput}
+                placeholder={t('config.searchPlaylists')}
+                value={playlistSearch}
+                onChange={(e) => setPlaylistSearch(e.target.value)}
+                onFocus={() => {
+                  setIsPlaylistDropdownOpen(true);
+                  // Reset search filter when opening dropdown
+                  setPlaylistSearch('');
+                }}
+                aria-label="Search playlists"
+              />
+              <button 
+                className={styles.comboboxButton}
+                onClick={() => {
+                  const newState = !isPlaylistDropdownOpen;
+                  setIsPlaylistDropdownOpen(newState);
+                  // Reset search filter when opening dropdown
+                  if (newState) {
+                    setPlaylistSearch('');
+                  }
+                }}
+                aria-label="Toggle playlist dropdown"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+            
+            {isPlaylistDropdownOpen && (
+              <div className={styles.comboboxDropdown} ref={playlistDropdownRef}>
+                {isPlaylistsLoading ? (
+                  <div className={styles.loadingItem}>{t('config.loadingPlaylists')}</div>
+                ) : filteredPlaylists.length > 0 ? (
+                  filteredPlaylists.map(playlist => (
+                    <div 
+                      key={playlist.id}
+                      className={styles.comboboxItem}
+                      onClick={() => {
+                        console.log('ConfigPanel: User selected playlist:', playlist.name);
+                        playlistChangeRef.current = true;
+                        setLocalSelectedPlaylist(playlist);
+                        setPlaylistSearch(playlist.name);
+                        setIsPlaylistDropdownOpen(false);
+                      }}
+                    >
+                      <div className={styles.comboboxItemName}>{playlist.name}</div>
+                      <div className={styles.comboboxItemDescription}>{playlist.description}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className={styles.emptyItem}>{t('config.noPlaylistsFound')}</div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {localSelectedPlaylist && (
+            <div className={styles.selectedPlaylist}>
+              <div className={styles.selectedPlaylistName}>{localSelectedPlaylist.name}</div>
+              <div className={styles.selectedPlaylistDescription}>{localSelectedPlaylist.description}</div>
+            </div>
+          )}
         </div>
       </div>
     </div>
