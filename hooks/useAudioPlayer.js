@@ -199,16 +199,35 @@ export const useAudioPlayer = (initialSongs = []) => {
   }, []);
 
   const handleProgressBarClick = useCallback((e) => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !duration) return;
     
     const progressBar = e.currentTarget;
     const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
     const progressBarWidth = progressBar.clientWidth;
-    const clickPositionPercent = (clickPosition / progressBarWidth) * 100;
+    
+    // Ensure click position is within bounds
+    const boundedClickPosition = Math.max(0, Math.min(clickPosition, progressBarWidth));
+    
+    // Calculate percentage and time to seek
+    const clickPositionPercent = (boundedClickPosition / progressBarWidth) * 100;
     const timeToSeek = (clickPositionPercent / 100) * duration;
     
+    // Ensure the time is valid
+    if (isNaN(timeToSeek) || timeToSeek < 0 || timeToSeek > duration) {
+      console.error('Invalid seek time:', timeToSeek, 'duration:', duration);
+      return;
+    }
+    
+    // Update audio position and UI
     audioRef.current.currentTime = timeToSeek;
     setCurrentTime(timeToSeek);
+    
+    // Update progress bar immediately for better UX
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = `${clickPositionPercent}%`;
+    }
+    
+    console.log(`Seeking to ${timeToSeek.toFixed(2)}s (${clickPositionPercent.toFixed(1)}%)`);
   }, [duration]);
 
   // Initialize audio element when first loaded

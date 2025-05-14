@@ -260,11 +260,14 @@ export default function Home() {
             {/* Progress Bar */}
             <div className="mb-4">
               <div 
-                className="relative h-2 bg-gray-700 rounded-full cursor-pointer"
-                ref={progressBarRef}
+                className="relative h-2 bg-gray-700 rounded-full cursor-pointer overflow-hidden"
                 onClick={handleProgressBarClick}
               >
+                {/* Background track indicator */}
+                <div className="absolute top-0 left-0 h-full w-full bg-gray-600 rounded-full"></div>
+                {/* Playback progress */}
                 <div 
+                  ref={progressBarRef}
                   className="absolute top-0 left-0 h-full bg-blue-500 rounded-full"
                   style={{ width: `${(currentTime / duration) * 100}%` }}
                 >
