@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 
+// Import the Sentry webpack plugin
+const { withSentryConfig } = require('@sentry/nextjs');
+
 // Base configuration
 const baseConfig = {
   reactStrictMode: true,
@@ -37,4 +40,24 @@ const prodConfig = {
 };
 
 // Use different config based on environment
-module.exports = process.env.NODE_ENV === 'development' ? devConfig : prodConfig;
+const nextConfig = process.env.NODE_ENV === 'development' ? devConfig : prodConfig;
+
+// Sentry configuration
+const sentryWebpackPluginOptions = {
+  // Additional config options for the Sentry webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, org, project, authToken, configFile, stripPrefix,
+  //   urlPrefix, include, ignore
+  silent: true, // Suppresses all logs
+};
+
+// Check if SENTRY_DSN is set
+if (process.env.SENTRY_DSN) {
+  console.log('Configuring Sentry in Next.js build...');
+  module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+  console.log('Sentry configured in Next.js build successfully');
+} else {
+  console.log('Sentry configuration skipped: No DSN provided');
+  module.exports = nextConfig;
+}

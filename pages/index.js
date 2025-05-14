@@ -9,6 +9,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import TelegramUser from '../components/TelegramUser';
 import ConfigPanel from '../components/ConfigPanel';
 import VersionPanel from '../components/VersionPanel';
+import { captureError, isSentryInitialized } from '../utils/errorReporting';
 
 export default function Home() {
   // Initialize with empty array - songs will be fetched from API
@@ -105,6 +106,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error fetching default playlist:', error);
+      // Report error to Sentry if initialized
+      captureError(error, { component: 'Player', action: 'fetchDefaultPlaylist' });
     } finally {
       setIsPlaylistsLoading(false);
     }
@@ -113,6 +116,10 @@ export default function Home() {
   // Load songs and default playlist on component mount
   useEffect(() => {
     console.log('Component mounted, fetching songs from API...');
+    
+    // Log Sentry initialization status
+    console.log(`Sentry initialization status: ${isSentryInitialized() ? 'Initialized' : 'Not initialized'}`);
+    
     fetchSongs();
     fetchDefaultPlaylist();
   }, []);

@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import styles from '../styles/TelegramUser.module.css';
 import { useAppConfig } from '../hooks/useAppConfig';
+import { setUserContext, captureError, isSentryInitialized } from '../utils/errorReporting';
 
 // Create context for sharing user data and config
 export const TelegramContext = createContext({
@@ -67,6 +68,12 @@ export const TelegramProvider = ({ children }) => {
             setUser(window.Telegram.WebApp.user);
             if (initAttempts === 0) {
               console.log('User found directly:', window.Telegram.WebApp.user);
+              
+              // Set user context in Sentry if initialized
+              if (isSentryInitialized()) {
+                setUserContext(window.Telegram.WebApp.user);
+                console.log('User context set in Sentry');
+              }
             }
             initCompletedRef.current = true;
             return;
@@ -95,6 +102,8 @@ export const TelegramProvider = ({ children }) => {
         } catch (userError) {
           if (initAttempts === 0) {
             console.error('Error accessing user data:', userError);
+            // Report error to Sentry if initialized
+            captureError(userError, { component: 'TelegramProvider', action: 'accessUserData', initAttempts });
           }
           
           // Create mock user in development on error
@@ -105,6 +114,8 @@ export const TelegramProvider = ({ children }) => {
       } catch (error) {
         if (initAttempts === 0) {
           console.error('Error initializing Telegram WebApp:', error);
+          // Report error to Sentry if initialized
+          captureError(error, { component: 'TelegramProvider', action: 'initTelegramWebApp', initAttempts });
         }
       }
     };
