@@ -56,6 +56,8 @@ const sentryWebpackPluginOptions = {
   transpileClientSDK: true,
   tunnelRoute: '/monitoring',
   hideSourceMaps: true,
+  disableServerWebpackPlugin: false,
+  disableClientWebpackPlugin: false,
 };
 
 // Check if SENTRY_DSN is set

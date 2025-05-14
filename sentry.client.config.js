@@ -3,7 +3,6 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
-import { BrowserProfilingIntegration } from '@sentry/profiling-node';
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
 
@@ -18,16 +17,17 @@ if (SENTRY_DSN) {
     environment: process.env.NODE_ENV,
     // Optional: Set a release version
     release: process.env.NEXT_PUBLIC_APP_VERSION || 'development',
+    // Browser-specific integrations
     integrations: [
-      // Enable browser profiling integration
-      new BrowserProfilingIntegration(),
+      new Sentry.BrowserTracing(),
+      new Sentry.Replay({
+        // This sets the sample rate to be 10% for normal sessions
+        sessionSampleRate: 0.1,
+        // If the entire session is not sampled, use the below sample rate to sample
+        // sessions when an error occurs.
+        errorSampleRate: 1.0,
+      }),
     ],
-    // This sets the sample rate to be 10%. You may want this to be 100% while
-    // in development and sample at a lower rate in production
-    replaysSessionSampleRate: 0.1,
-    // If the entire session is not sampled, use the below sample rate to sample
-    // sessions when an error occurs.
-    replaysOnErrorSampleRate: 1.0,
   });
   console.log('Sentry client-side initialized successfully');
 } else {
