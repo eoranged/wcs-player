@@ -3,6 +3,7 @@ import styles from '../styles/ConfigPanel.module.css';
 import { useDebounce } from '../hooks/useDebounce';
 import { useTranslation } from 'next-i18next';
 import { fetchPlaylists } from '../utils/api';
+import TempoSlider from './TempoSlider';
 
 const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist, onPlaylistChange }) => {
   const { t } = useTranslation('common');
@@ -13,7 +14,7 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
   
   const [localRange, setLocalRange] = useState(initialRange);
   const [musicStyle, setMusicStyle] = useState('West Coast Swing');
-  const [playlistSearch, setPlaylistSearch] = useState(initialPlaylist ? initialPlaylist.name : '');
+  const [playlistSearch, setPlaylistSearch] = useState('');
   const [playlists, setPlaylists] = useState([]);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
   const [localSelectedPlaylist, setLocalSelectedPlaylist] = useState(initialPlaylist);
@@ -160,19 +161,23 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
     loadPlaylists();
   }, [musicStyle, loadPlaylists]);
   
-  // Filter playlists based on search term and tempo range
-  const filteredPlaylists = playlists.filter(playlist => {
-    // First check if the playlist name or description matches the search term
-    const matchesSearch = 
-      playlist.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      playlist.description.toLowerCase().includes(debouncedSearch.toLowerCase());
-    
-    // Then check if the playlist's tempo range overlaps with the selected tempo range
-    // A playlist is excluded only if it's completely outside the selected range
-    const matchesTempo = 
-      !(playlist.tempoMax < localRange.min || playlist.tempoMin > localRange.max);
-    
-    return matchesSearch && matchesTempo;
+  // Filter playlists based on search term only
+  const searchFilteredPlaylists = playlists.filter(playlist => {
+    // Check if the playlist name or description matches the search term
+    return playlist.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+           playlist.description.toLowerCase().includes(debouncedSearch.toLowerCase());
+  });
+  
+  // Count playlists hidden due to tempo range mismatch
+  const hiddenPlaylistsCount = searchFilteredPlaylists.filter(playlist => {
+    // A playlist is outside the tempo range if it's completely outside the selected range
+    return playlist.tempoMax < localRange.min || playlist.tempoMin > localRange.max;
+  }).length;
+  
+  // Final filtered playlists (matching both search and tempo range)
+  const filteredPlaylists = searchFilteredPlaylists.filter(playlist => {
+    // Only include playlists that overlap with the selected tempo range
+    return !(playlist.tempoMax < localRange.min || playlist.tempoMin > localRange.max);
   });
   
   // Notify parent component when playlist changes, but only when needed
@@ -252,157 +257,98 @@ const ConfigPanel = ({ onClose, tempoRange, onTempoRangeChange, selectedPlaylist
       </div>
       
       <div className={styles.configContent}>
-        {/* Music Style Section */}
-        <div className={styles.configSection}>
-          <h4>{t('config.musicStyle')}</h4>
-          <div className={styles.selectContainer}>
-            <select 
-              className={styles.select}
-              value={musicStyle}
-              onChange={(e) => setMusicStyle(e.target.value)}
-              aria-label="Select music style"
-            >
-              <option value="West Coast Swing">West Coast Swing</option>
-              <option value="Bachata">Bachata</option>
-              <option value="Salsa">Salsa</option>
-            </select>
-            <div className={styles.selectArrow}></div>
-          </div>
-        </div>
-        
+        {/* Music Style Section - removed, now handled by top navigation */}
         {/* Tempo Range Section - Placed right after style selection */}
         <div className={styles.configSection}>
           <h4>{t('config.tempoRange')}</h4>
-          
-          <div className={styles.tempoRangeSlider}>
-            {/* Background track */}
-            <div 
-              ref={trackRef}
-              className={styles.sliderTrack}
-            >
-              {/* Selected range */}
-              <div 
-                className={styles.sliderRange}
-                style={{
-                  left: `${((localRange.min - 20) / 180) * 100}%`,
-                  right: `${100 - ((localRange.max - 20) / 180) * 100}%`
-                }}
-              ></div>
-              
-              {/* Min thumb */}
-              <div 
-                className={styles.sliderThumb}
-                style={{
-                  left: `${((localRange.min - 20) / 180) * 100}%`
-                }}
-                onMouseDown={(e) => handleThumbMouseDown(e, 'min')}
-                onTouchStart={(e) => handleThumbTouchStart(e, 'min')}
-              >
-                <div className={styles.thumbLabel}>
-                  {localRange.min}
-                </div>
-              </div>
-              
-              {/* Max thumb */}
-              <div 
-                className={styles.sliderThumb}
-                style={{
-                  left: `${((localRange.max - 20) / 180) * 100}%`
-                }}
-                onMouseDown={(e) => handleThumbMouseDown(e, 'max')}
-                onTouchStart={(e) => handleThumbTouchStart(e, 'max')}
-              >
-                <div className={styles.thumbLabel}>
-                  {localRange.max}
-                </div>
-              </div>
-              
-              {/* Clickable area */}
-              <div 
-                className={styles.sliderClickArea}
-                onMouseDown={handleTrackClick}
-                onTouchStart={(e) => {
-                  const touch = e.touches[0];
-                  const fakeEvent = { 
-                    clientX: touch.clientX,
-                    preventDefault: () => {}
-                  };
-                  handleTrackClick(fakeEvent);
-                }}
-              />
-            </div>
-          </div>
+          <TempoSlider value={localRange} onChange={setLocalRange} />
         </div>
         
         {/* Playlists Section - Now comes after tempo range */}
         <div className={styles.configSection}>
           <h4>{t('config.playlists')}</h4>
-          <div className={styles.comboboxContainer}>
-            <div className={styles.inputContainer}>
-              <input
-                ref={playlistInputRef}
-                type="text"
-                className={styles.comboboxInput}
-                placeholder={t('config.searchPlaylists')}
-                value={playlistSearch}
-                onChange={(e) => setPlaylistSearch(e.target.value)}
-                onFocus={() => {
-                  setIsPlaylistDropdownOpen(true);
-                  // Reset search filter when opening dropdown
-                  setPlaylistSearch('');
-                }}
-                aria-label="Search playlists"
-              />
-              <button 
-                className={styles.comboboxButton}
-                onClick={() => {
-                  const newState = !isPlaylistDropdownOpen;
-                  setIsPlaylistDropdownOpen(newState);
-                  // Reset search filter when opening dropdown
-                  if (newState) {
-                    setPlaylistSearch('');
-                  }
-                }}
-                aria-label="Toggle playlist dropdown"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </button>
+          
+          {isPlaylistsLoading ? (
+            <div className={styles.loadingContainer}>
+              <div className={styles.loadingItem}>{t('config.loadingPlaylists')}</div>
             </div>
-            
-            {isPlaylistDropdownOpen && (
-              <div className={styles.comboboxDropdown} ref={playlistDropdownRef}>
-                {isPlaylistsLoading ? (
-                  <div className={styles.loadingItem}>{t('config.loadingPlaylists')}</div>
-                ) : filteredPlaylists.length > 0 ? (
-                  filteredPlaylists.map(playlist => (
-                    <div 
-                      key={playlist.id}
-                      className={styles.comboboxItem}
-                      onClick={() => {
-                        console.log('ConfigPanel: User selected playlist:', playlist.name);
-                        playlistChangeRef.current = true;
-                        setLocalSelectedPlaylist(playlist);
-                        setPlaylistSearch(playlist.name);
-                        setIsPlaylistDropdownOpen(false);
-                      }}
-                    >
-                      <div className={styles.comboboxItemName}>{playlist.name}</div>
-                      <div className={styles.comboboxItemDescription}>{playlist.description}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.emptyItem}>{t('config.noPlaylistsFound')}</div>
+          ) : filteredPlaylists.length > 0 ? (
+            <div className={styles.playlistList}>
+              {/* Search input for filtering playlists */}
+              <div className={styles.searchContainer}>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder={t('config.searchPlaylists')}
+                  value={playlistSearch}
+                  onChange={(e) => setPlaylistSearch(e.target.value)}
+                  aria-label="Search playlists"
+                />
+                {playlistSearch && (
+                  <button 
+                    className={styles.clearSearchButton}
+                    onClick={() => setPlaylistSearch('')}
+                    aria-label="Clear search"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
                 )}
               </div>
-            )}
-          </div>
-          
-          {localSelectedPlaylist && (
-            <div className={styles.selectedPlaylist}>
-              <div className={styles.selectedPlaylistName}>{localSelectedPlaylist.name}</div>
-              <div className={styles.selectedPlaylistDescription}>{localSelectedPlaylist.description}</div>
+              
+              {/* List of playlists */}
+              <div className={styles.playlistItems}>
+                {filteredPlaylists.map(playlist => (
+                  <div 
+                    key={playlist.id}
+                    className={`${styles.playlistItem} ${localSelectedPlaylist && localSelectedPlaylist.id === playlist.id ? styles.playlistItemSelected : ''}`}
+                    onClick={() => {
+                      console.log('ConfigPanel: User selected playlist:', playlist.name);
+                      playlistChangeRef.current = true;
+                      setLocalSelectedPlaylist(playlist);
+                    }}
+                  >
+                    <div className={styles.playlistItemContent}>
+                      <div className={styles.playlistItemName}>{playlist.name}</div>
+                      <div className={styles.playlistItemDescription}>{playlist.description}</div>
+                      <div className={styles.playlistItemTempo}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>{playlist.minTempo}-{playlist.maxTempo} BPM</span>
+                      </div>
+                    </div>
+                    {localSelectedPlaylist && localSelectedPlaylist.id === playlist.id && (
+                      <div className={styles.playlistItemSelected}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Message showing hidden playlists due to tempo mismatch */}
+                {hiddenPlaylistsCount > 0 && (
+                  <div className={styles.hiddenPlaylistsMessage}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>
+                      {hiddenPlaylistsCount} {hiddenPlaylistsCount === 1 ? 'playlist is' : 'playlists are'} hidden because of tempo mismatch
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.emptyContainer}>
+              <div className={styles.emptyItem}>{t('config.noPlaylistsFound')}</div>
             </div>
           )}
         </div>

@@ -21,6 +21,34 @@
       "minTempo": 110,
       "maxTempo": 140,
       "description": "Faster songs for advanced West Coast Swing dancers"
+    },
+    {
+      "id": "wcs_contemporary",
+      "name": "WCS Contemporary",
+      "minTempo": 95,
+      "maxTempo": 120,
+      "description": "Modern pop and contemporary hits for West Coast Swing"
+    },
+    {
+      "id": "wcs_classics",
+      "name": "WCS Classics",
+      "minTempo": 85,
+      "maxTempo": 115,
+      "description": "Classic R&B, soul, and blues for West Coast Swing"
+    },
+    {
+      "id": "wcs_competitions",
+      "name": "WCS Competitions",
+      "minTempo": 105,
+      "maxTempo": 130,
+      "description": "Popular songs used in WCS competitions"
+    },
+    {
+      "id": "wcs_showcase",
+      "name": "WCS Showcase",
+      "minTempo": 90,
+      "maxTempo": 125,
+      "description": "Showcase and performance songs for West Coast Swing"
     }
   ]
 }

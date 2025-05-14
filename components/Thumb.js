@@ -1,7 +1,6 @@
 import { memo } from 'react';
 
 const Thumb = memo(({ 
-  value, 
   position, 
   onMouseDown, 
   onTouchStart,
@@ -18,11 +17,7 @@ const Thumb = memo(({
       }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
-    >
-      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-blue-400">
-        {value}
-      </div>
-    </div>
+    />
   );
 });
 

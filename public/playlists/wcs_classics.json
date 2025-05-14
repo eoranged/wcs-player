@@ -1,0 +1,59 @@
+{
+  "id": "wcs_classics",
+  "name": "WCS Classics",
+  "style": "West Coast Swing",
+  "minTempo": 85,
+  "maxTempo": 115,
+  "songs": [
+    {
+      "id": "wcs_cl_1",
+      "title": "Ain't No Sunshine",
+      "artist": "Bill Withers",
+      "album": "Just As I Am",
+      "tempo": 90,
+      "duration": 125,
+      "cover": "https://placehold.co/512x512?text=Ain%27t+No+Sunshine",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"
+    },
+    {
+      "id": "wcs_cl_2",
+      "title": "Superstition",
+      "artist": "Stevie Wonder",
+      "album": "Talking Book",
+      "tempo": 100,
+      "duration": 250,
+      "cover": "https://placehold.co/512x512?text=Superstition",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3"
+    },
+    {
+      "id": "wcs_cl_3",
+      "title": "I Wish",
+      "artist": "Stevie Wonder",
+      "album": "Songs in the Key of Life",
+      "tempo": 110,
+      "duration": 210,
+      "cover": "https://placehold.co/512x512?text=I+Wish",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
+    },
+    {
+      "id": "wcs_cl_4",
+      "title": "September",
+      "artist": "Earth, Wind & Fire",
+      "album": "The Best of Earth, Wind & Fire, Vol. 1",
+      "tempo": 112,
+      "duration": 215,
+      "cover": "https://placehold.co/512x512?text=September",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3"
+    },
+    {
+      "id": "wcs_cl_5",
+      "title": "Let's Stay Together",
+      "artist": "Al Green",
+      "album": "Let's Stay Together",
+      "tempo": 95,
+      "duration": 190,
+      "cover": "https://placehold.co/512x512?text=Let%27s+Stay+Together",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"
+    }
+  ]
+} 

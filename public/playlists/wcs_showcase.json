@@ -1,0 +1,59 @@
+{
+  "id": "wcs_showcase",
+  "name": "WCS Showcase",
+  "style": "West Coast Swing",
+  "minTempo": 90,
+  "maxTempo": 125,
+  "songs": [
+    {
+      "id": "wcs_show_1",
+      "title": "Elastic Heart",
+      "artist": "Sia",
+      "album": "1000 Forms of Fear",
+      "tempo": 100,
+      "duration": 250,
+      "cover": "https://placehold.co/512x512?text=Elastic+Heart",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-21.mp3"
+    },
+    {
+      "id": "wcs_show_2",
+      "title": "Chandelier",
+      "artist": "Sia",
+      "album": "1000 Forms of Fear",
+      "tempo": 105,
+      "duration": 216,
+      "cover": "https://placehold.co/512x512?text=Chandelier",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-22.mp3"
+    },
+    {
+      "id": "wcs_show_3",
+      "title": "Say You Won't Let Go",
+      "artist": "James Arthur",
+      "album": "Back from the Edge",
+      "tempo": 92,
+      "duration": 210,
+      "cover": "https://placehold.co/512x512?text=Say+You+Won%27t+Let+Go",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-23.mp3"
+    },
+    {
+      "id": "wcs_show_4",
+      "title": "Rise Up",
+      "artist": "Andra Day",
+      "album": "Cheers to the Fall",
+      "tempo": 98,
+      "duration": 230,
+      "cover": "https://placehold.co/512x512?text=Rise+Up",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-24.mp3"
+    },
+    {
+      "id": "wcs_show_5",
+      "title": "Shallow",
+      "artist": "Lady Gaga & Bradley Cooper",
+      "album": "A Star Is Born Soundtrack",
+      "tempo": 120,
+      "duration": 215,
+      "cover": "https://placehold.co/512x512?text=Shallow",
+      "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-25.mp3"
+    }
+  ]
+} 
