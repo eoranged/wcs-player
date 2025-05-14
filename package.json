@@ -20,7 +20,8 @@
   "description": "",
   "dependencies": {
     "@sentry/nextjs": "^9.18.0",
-    "next": "^13.4.19",
+    "@sentry/profiling-node": "^1.3.2",
+    "next": "^15.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

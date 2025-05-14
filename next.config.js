@@ -6,7 +6,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 // Base configuration
 const baseConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify is now enabled by default in Next.js 15
   images: {
     unoptimized: true,
   },
@@ -30,8 +30,9 @@ const devConfig = {
 // Production configuration
 const prodConfig = {
   ...baseConfig,
-  // Removed 'output: export' to enable API routes in production
+  // Next.js 15 recommended configuration
   skipTrailingSlashRedirect: true,
+  // Use modern exportPathMap syntax
   exportPathMap: async function() {
     return {
       '/': { page: '/' },
@@ -42,7 +43,7 @@ const prodConfig = {
 // Use different config based on environment
 const nextConfig = process.env.NODE_ENV === 'development' ? devConfig : prodConfig;
 
-// Sentry configuration
+// Sentry configuration for Next.js 15
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -50,6 +51,11 @@ const sentryWebpackPluginOptions = {
   //   release, url, org, project, authToken, configFile, stripPrefix,
   //   urlPrefix, include, ignore
   silent: true, // Suppresses all logs
+  // Next.js 15 specific options
+  widenClientFileUpload: true,
+  transpileClientSDK: true,
+  tunnelRoute: '/monitoring',
+  hideSourceMaps: true,
 };
 
 // Check if SENTRY_DSN is set

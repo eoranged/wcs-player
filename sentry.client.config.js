@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { BrowserProfilingIntegration } from '@sentry/profiling-node';
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
 
@@ -18,7 +19,8 @@ if (SENTRY_DSN) {
     // Optional: Set a release version
     release: process.env.NEXT_PUBLIC_APP_VERSION || 'development',
     integrations: [
-      new Sentry.BrowserTracing(),
+      // Enable browser profiling integration
+      new BrowserProfilingIntegration(),
     ],
     // This sets the sample rate to be 10%. You may want this to be 100% while
     // in development and sample at a lower rate in production
