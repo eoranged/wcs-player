@@ -9,7 +9,6 @@ import TelegramUser from '../components/TelegramUser';
 import TelegramUserProfile from '../components/TelegramUserProfile';
 import ProfilePanel from '../components/ProfilePanel';
 import HelpPanel from '../components/HelpPanel';
-import ConfigPanel from '../components/ConfigPanel';
 import { captureError, isSentryInitialized } from '../utils/errorReporting';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -29,7 +28,6 @@ export default function Home({ tempoRange, setTempoRange }) {
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [activePanel, setActivePanel] = useState(null); // 'profile', 'settings', 'help', or null
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
@@ -212,7 +210,6 @@ export default function Home({ tempoRange, setTempoRange }) {
             playNextSong={playNextSong}
             selectedPlaylist={selectedPlaylist}
             tempoRange={tempoRange}
-            setShowConfigPanel={setShowConfigPanel}
           />
         </div>
         <audio
