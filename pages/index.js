@@ -26,14 +26,14 @@ export async function getServerSideProps({ locale }) {
 
 export default function Home({ tempoRange, setTempoRange }) {
   const { t } = useTranslation('common');
-  // Initialize with empty array - songs will be fetched from API
   const [songs, setSongs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [activePanel, setActivePanel] = useState(null); // 'profile', 'settings', 'help', or null
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
 
   // Use the audio player hook with the songs from state
   // This ensures the hook always has the latest songs
@@ -70,7 +70,7 @@ export default function Home({ tempoRange, setTempoRange }) {
   };
   
   // Fetch songs from local JSON files and filter by tempo range
-  const fetchSongs = async (playlistId = 'wcs_beginner') => {
+  const fetchSongs = async (playlistId) => {
     try {
       setIsLoading(true);
       console.log(`Fetching songs for playlist: ${playlistId}...`);
@@ -136,23 +136,7 @@ export default function Home({ tempoRange, setTempoRange }) {
     }
   };
 
-  // Load songs and default playlist on component mount
-  useEffect(() => {
-    console.log('Component mounted, fetching songs from API...');
-    
-    // Log Sentry initialization status
-    console.log(`Sentry initialization status: ${isSentryInitialized() ? 'Initialized' : 'Not initialized'}`);
-    
-    fetchSongs();
-    fetchDefaultPlaylist();
-  }, []);
-  
-  // Log initial songs load - only once
-  useEffect(() => {
-    if (songs.length > 0) {
-      console.log(`Songs loaded from API: ${songs.length} songs available`);
-    }
-  }, [songs.length > 0]); // This will only run once when songs are first loaded
+  // No initial fetch; only fetch when playlist is selected
 
   // Re-filter songs when tempo range changes
   useEffect(() => {
@@ -184,7 +168,7 @@ export default function Home({ tempoRange, setTempoRange }) {
 
   const handleRetry = () => {
     setError(null);
-    fetchSongs();
+    fetchSongs(selectedPlaylist.id);
   };
 
   if (isLoading) {
@@ -203,10 +187,67 @@ export default function Home({ tempoRange, setTempoRange }) {
     );
   }
 
+  // Show Player if a playlist is selected
+  if (showPlayer && selectedPlaylist) {
+    const currentSong = songs[currentSongIndex];
+    return (
+      <div className="max-w-md mx-auto w-full flex flex-col">
+        <button
+          className="mb-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 self-start"
+          onClick={() => setShowPlayer(false)}
+        >
+          ← Back to Playlists
+        </button>
+        <div className="bg-gray-800 rounded-2xl p-4 shadow-2xl flex flex-col overflow-hidden">
+          <Player
+            currentSong={currentSong}
+            isPlaying={isPlaying}
+            currentTime={currentTime}
+            duration={duration}
+            progressBarRef={progressBarRef}
+            formatTime={formatTime}
+            handleProgressBarClick={handleProgressBarClick}
+            playPreviousSong={playPreviousSong}
+            togglePlayPause={togglePlayPause}
+            playNextSong={playNextSong}
+            selectedPlaylist={selectedPlaylist}
+            tempoRange={tempoRange}
+            setShowConfigPanel={setShowConfigPanel}
+          />
+        </div>
+        <audio
+          ref={audioRef}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleTimeUpdate}
+          onEnded={playNextSong}
+          className="hidden"
+          preload="metadata"
+        />
+      </div>
+    );
+  }
+
+  // Show HomePage with playlist selection
   return (
     <div className="max-w-md mx-auto w-full flex flex-col">
-      {/* Home Page Music Styles and Albums */}
-      <HomePage tempoRange={tempoRange} />
+      <HomePage
+        tempoRange={tempoRange}
+        onPlaylistSelect={async (playlist) => {
+          setSelectedPlaylist(playlist);
+          setIsLoading(true);
+          setShowPlayer(false);
+          try {
+            const data = await fetchMusicLibrary(playlist.id);
+            const filtered = filterSongsByTempo(data, tempoRange);
+            setSongs(filtered);
+            setShowPlayer(true);
+          } catch (e) {
+            setError('Failed to load playlist');
+          } finally {
+            setIsLoading(false);
+          }
+        }}
+      />
     </div>
   );
 }

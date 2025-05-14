@@ -10,7 +10,7 @@ const MUSIC_STYLES = [
 
 const PLACEHOLDER_IMG = 'https://placehold.co/100x80?text=Playlist';
 
-const HomePage = ({ tempoRange }) => {
+const HomePage = ({ tempoRange, onPlaylistSelect }) => {
   const [selectedStyle, setSelectedStyle] = useState('West Coast Swing');
   const [playlists, setPlaylists] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,6 +62,7 @@ const HomePage = ({ tempoRange }) => {
               key={playlist.id}
               className="relative bg-gray-900 rounded-xl shadow-lg overflow-hidden flex flex-col cursor-pointer group"
               title={playlist.description}
+              onClick={() => onPlaylistSelect && onPlaylistSelect(playlist)}
             >
               {/* Image with overlay */}
               <div className="relative w-full aspect-square h-20 sm:h-24">
