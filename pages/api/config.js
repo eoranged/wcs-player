@@ -21,14 +21,22 @@ export default function handler(req, res) {
       env: process.env.NODE_ENV || 'production'
     };
     
-    // Check if user is admin
+    // Check if user is admin by ID match
+    let isUserAdmin = false;
     if (user && user.id && adminUserId) {
       // Convert both to strings for comparison
-      config.isAdmin = String(user.id) === String(adminUserId);
+      isUserAdmin = String(user.id) === String(adminUserId);
     }
     
-    // Set feature flags based on user permissions
-    config.features.debugPanel = config.isAdmin || process.env.NODE_ENV === 'development';
+    // Check if debug mode is enabled globally
+    const isDebugMode = adminUserId === 'DEBUG';
+    
+    // Set admin status
+    config.isAdmin = isUserAdmin;
+    
+    // Set feature flags based on permissions
+    // Show debug panel if user is admin OR if debug mode is enabled
+    config.features.debugPanel = isUserAdmin || isDebugMode;
     
     // Return configuration
     return res.status(200).json(config);

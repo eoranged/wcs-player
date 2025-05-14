@@ -1,13 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from '../styles/DebugPanel.module.css';
 
+// Store console logs globally to persist between component mounts
+let globalLogs = [];
+let consoleOverrideApplied = false;
+
+// Override console methods at module level
+if (typeof window !== 'undefined' && !consoleOverrideApplied) {
+  const originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info
+  };
+
+  // Helper to format arguments
+  const formatArgs = (args) => {
+    return args.map(arg => {
+      if (typeof arg === 'object') {
+        try {
+          return JSON.stringify(arg, null, 2);
+        } catch (e) {
+          return String(arg);
+        }
+      }
+      return String(arg);
+    }).join(' ');
+  };
+
+  // Override console methods
+  console.log = (...args) => {
+    const message = formatArgs(args);
+    globalLogs.push({ type: 'log', message, timestamp: new Date() });
+    originalConsole.log(...args);
+  };
+
+  console.error = (...args) => {
+    const message = formatArgs(args);
+    globalLogs.push({ type: 'error', message, timestamp: new Date() });
+    originalConsole.error(...args);
+  };
+
+  console.warn = (...args) => {
+    const message = formatArgs(args);
+    globalLogs.push({ type: 'warn', message, timestamp: new Date() });
+    originalConsole.warn(...args);
+  };
+
+  console.info = (...args) => {
+    const message = formatArgs(args);
+    globalLogs.push({ type: 'info', message, timestamp: new Date() });
+    originalConsole.info(...args);
+  };
+
+  // Limit the number of logs to prevent memory issues
+  setInterval(() => {
+    if (globalLogs.length > 1000) {
+      globalLogs = globalLogs.slice(-1000);
+    }
+  }, 10000);
+
+  consoleOverrideApplied = true;
+}
+
 const DebugPanel = ({ onClose }) => {
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState(globalLogs);
   const [isOpen, setIsOpen] = useState(true);
-  const originalConsoleLog = useRef(null);
-  const originalConsoleError = useRef(null);
-  const originalConsoleWarn = useRef(null);
-  const originalConsoleInfo = useRef(null);
   const logContainerRef = useRef(null);
 
   // Toggle panel visibility
@@ -22,60 +80,50 @@ const DebugPanel = ({ onClose }) => {
 
   // Clear logs
   const clearLogs = () => {
+    globalLogs = [];
     setLogs([]);
   };
 
+  // Copy logs to clipboard
+  const copyLogs = () => {
+    if (logs.length === 0) return;
+    
+    // Format logs for clipboard
+    const formattedLogs = logs.map(log => {
+      const time = formatTime(log.timestamp);
+      const type = log.type.toUpperCase();
+      return `[${time}] [${type}] ${log.message}`;
+    }).join('\n');
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(formattedLogs)
+      .then(() => {
+        // Show temporary success message
+        const tempMessage = { 
+          type: 'info', 
+          message: 'Logs copied to clipboard!', 
+          timestamp: new Date() 
+        };
+        setLogs(prevLogs => [...prevLogs, tempMessage]);
+      })
+      .catch(err => {
+        console.error('Failed to copy logs:', err);
+      });
+  };
+
+  // Update logs state when global logs change
   useEffect(() => {
-    // Store original console methods
-    originalConsoleLog.current = console.log;
-    originalConsoleError.current = console.error;
-    originalConsoleWarn.current = console.warn;
-    originalConsoleInfo.current = console.info;
-
-    // Override console methods to capture logs
-    console.log = (...args) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-      
-      setLogs(prevLogs => [...prevLogs, { type: 'log', message, timestamp: new Date() }]);
-      originalConsoleLog.current(...args);
+    const updateLogs = () => {
+      setLogs([...globalLogs]);
     };
-
-    console.error = (...args) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-      
-      setLogs(prevLogs => [...prevLogs, { type: 'error', message, timestamp: new Date() }]);
-      originalConsoleError.current(...args);
-    };
-
-    console.warn = (...args) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-      
-      setLogs(prevLogs => [...prevLogs, { type: 'warn', message, timestamp: new Date() }]);
-      originalConsoleWarn.current(...args);
-    };
-
-    console.info = (...args) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-      
-      setLogs(prevLogs => [...prevLogs, { type: 'info', message, timestamp: new Date() }]);
-      originalConsoleInfo.current(...args);
-    };
-
-    // Restore original console methods on unmount
-    return () => {
-      console.log = originalConsoleLog.current;
-      console.error = originalConsoleError.current;
-      console.warn = originalConsoleWarn.current;
-      console.info = originalConsoleInfo.current;
-    };
+    
+    // Update logs immediately
+    updateLogs();
+    
+    // Set up an interval to update logs periodically
+    const intervalId = setInterval(updateLogs, 500);
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   // Auto-scroll to bottom when logs update
@@ -95,10 +143,20 @@ const DebugPanel = ({ onClose }) => {
       <div className={styles.debugHeader}>
         <h3>Debug Console</h3>
         <div className={styles.debugControls}>
-          <button onClick={clearLogs} className={styles.clearButton} title="Clear logs">
-            Clear
+          <button onClick={copyLogs} className={styles.iconButton} title="Copy logs to clipboard" aria-label="Copy logs to clipboard">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
           </button>
-          <button onClick={togglePanel} className={styles.closeButton} title="Close debug panel">
+          <button onClick={clearLogs} className={styles.iconButton} title="Clear logs" aria-label="Clear logs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button onClick={togglePanel} className={styles.closeButton} title="Close debug panel" aria-label="Close debug panel">
             ×
           </button>
         </div>
