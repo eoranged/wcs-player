@@ -74,7 +74,9 @@ if (typeof window !== 'undefined' && !consoleOverrideApplied) {
 const DebugPanel = ({ onClose }) => {
   const [logs, setLogs] = useState(globalLogs);
   const [isOpen, setIsOpen] = useState(true);
+  const [autoScroll, setAutoScroll] = useState(true);
   const logContainerRef = useRef(null);
+  const prevLogsLengthRef = useRef(logs.length);
 
   // Toggle panel visibility
   const togglePanel = () => {
@@ -134,12 +136,29 @@ const DebugPanel = ({ onClose }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Auto-scroll to bottom when logs update
+  // Handle scrolling behavior
   useEffect(() => {
-    if (logContainerRef.current && isOpen) {
+    // Only auto-scroll if enabled and new logs were added
+    if (logContainerRef.current && isOpen && autoScroll && logs.length > prevLogsLengthRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
-  }, [logs, isOpen]);
+    
+    // Update previous logs length reference
+    prevLogsLengthRef.current = logs.length;
+  }, [logs, isOpen, autoScroll]);
+  
+  // Detect manual scrolling to disable auto-scroll
+  const handleScroll = () => {
+    if (!logContainerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = logContainerRef.current;
+    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 10;
+    
+    // Only update state if there's a change to prevent unnecessary renders
+    if (autoScroll !== isScrolledToBottom) {
+      setAutoScroll(isScrolledToBottom);
+    }
+  };
 
   // Format timestamp
   const formatTime = (date) => {
@@ -164,12 +183,22 @@ const DebugPanel = ({ onClose }) => {
               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
           </button>
+          <button 
+            onClick={() => setAutoScroll(!autoScroll)} 
+            className={`${styles.iconButton} ${autoScroll ? styles.active : ''}`} 
+            title={autoScroll ? "Auto-scroll enabled" : "Auto-scroll disabled"} 
+            aria-label="Toggle auto-scroll">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5"></path>
+              <path d="M5 12l7 7 7-7"></path>
+            </svg>
+          </button>
           <button onClick={togglePanel} className={styles.closeButton} title="Close debug panel" aria-label="Close debug panel">
             ×
           </button>
         </div>
       </div>
-      <div className={styles.debugContent} ref={logContainerRef}>
+      <div className={styles.debugContent} ref={logContainerRef} onScroll={handleScroll}>
         {logs.length === 0 ? (
           <div className={styles.emptyState}>No logs to display</div>
         ) : (
