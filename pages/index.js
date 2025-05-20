@@ -14,6 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Player from '../components/Player';
 import HomePage from '../components/HomePage';
+import DancerLoader from '../components/DancerLoader';
 
 export async function getServerSideProps({ locale }) {
   return {
@@ -32,6 +33,7 @@ export default function Home({ tempoRange, setTempoRange }) {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(false);
   const [showPlayer, setShowPlayer] = useState(false);
+  const [showDancerLoader, setShowDancerLoader] = useState(true);
 
   // Use the audio player hook with the songs from state
   // This ensures the hook always has the latest songs
@@ -164,10 +166,20 @@ export default function Home({ tempoRange, setTempoRange }) {
     // Only depend on songs array, not the playback state
   }, [songs]);
 
+  useEffect(() => {
+    // Show the dancer loader for 1.5 seconds on app start
+    const timer = setTimeout(() => setShowDancerLoader(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleRetry = () => {
     setError(null);
     fetchSongs(selectedPlaylist.id);
   };
+
+  if (showDancerLoader) {
+    return <DancerLoader text="Warming up the dance floor..." />;
+  }
 
   if (isLoading) {
     return (
