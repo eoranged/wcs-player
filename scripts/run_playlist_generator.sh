@@ -34,21 +34,21 @@ if ! command -v ffmpeg &> /dev/null; then
 fi
 
 # Check if virtual environment exists
-VENV_DIR="$SCRIPT_DIR/venv"
+VENV_DIR="$PROJECT_ROOT/.venv"
 if [ ! -d "$VENV_DIR" ]; then
     echo -e "${YELLOW}Creating virtual environment...${NC}"
     python3 -m venv "$VENV_DIR"
+    # Install/upgrade requirements
+    echo -e "${YELLOW}Installing/updating dependencies...${NC}"
+    pip install -q --upgrade pip
+    pip install -q -r "$SCRIPT_DIR/requirements.txt"
 fi
 
 # Activate virtual environment
 echo -e "${YELLOW}Activating virtual environment...${NC}"
 source "$VENV_DIR/bin/activate"
 
-# Install/upgrade requirements
-echo -e "${YELLOW}Installing/updating dependencies...${NC}"
-pip install -q --upgrade pip
-pip install -q -r "$SCRIPT_DIR/requirements.txt"
-
+#
 # Check if config file exists
 CONFIG_FILE="$SCRIPT_DIR/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
