@@ -1,0 +1,20 @@
+# Audio processing
+pydub>=0.25.1
+
+# Metadata extraction
+mutagen>=1.46.0
+
+# Audio fingerprinting
+pyacoustid>=1.2.2
+
+# SSH/SFTP for file uploads
+paramiko>=2.9.0
+
+# HTTP requests (if needed)
+requests>=2.28.0
+
+# Image processing for cover art
+pillow>=9.0.0
+
+# Additional dependencies that might be useful
+tqdm>=4.64.0

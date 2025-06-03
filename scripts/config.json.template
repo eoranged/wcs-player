@@ -1,0 +1,19 @@
+{
+  "acoustid": {
+    "api_key": "YOUR_ACOUSTID_API_KEY"
+  },
+  "ssh": {
+    "hostname": "your-server.com",
+    "username": "username",
+    "key_filename": "~/.ssh/id_rsa",
+    "remote_path": "/var/www/audio/"
+  },
+  "output": {
+    "playlists_dir": "public/playlists",
+    "styles_dir": "public/styles"
+  },
+  "audio": {
+    "bitrate": "128k",
+    "sample_rate": 44100
+  }
+}
