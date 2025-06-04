@@ -6,8 +6,9 @@ This script processes music files, converts them to MP3, generates AcoustID fing
 uploads them to a server via SSH, and creates/updates playlist files.
 
 Requirements:
-- pip install pydub mutagen pyacoustid paramiko requests pillow
+- pip install pydub mutagen pyacoustid paramiko requests pillow librosa
 - ffmpeg must be installed on the system
+- librosa is optional but recommended for automatic tempo measurement
 """
 
 import os
@@ -44,13 +45,15 @@ try:
     from PIL import Image  # type: ignore
     PIL_AVAILABLE = True
 except ImportError:
-    # Try alternative import
-    try:
-        import PIL  # type: ignore
-        Image = PIL.Image
-        PIL_AVAILABLE = True
-    except ImportError:
-        print("Warning: PIL/Pillow not available. Cover art extraction will be disabled.")
+    print("Warning: PIL/Pillow not available. Cover art extraction will be disabled.")
+
+LIBROSA_AVAILABLE = False
+librosa = None
+try:
+    import librosa  # type: ignore
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    print("Warning: librosa not available. Tempo measurement will be disabled.")
 
 # Import ID3 classes with error handling for different mutagen versions
 ID3NoHeaderError = Exception
@@ -79,15 +82,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class PlaylistGenerator:
-    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False):
+    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False, skip_no_tempo: bool = False):
         """Initialize the playlist generator with configuration."""
         self.config = self._load_config(config_path)
         self.style = style
         self.playlist_name = playlist_name
+        self.skip_no_tempo = skip_no_tempo
         self.processed_files = []
         self.skipped_files = []
         self.errors = []
         self.metadata_errors = []
+        self.tempo_measured_files = []
         
         # Verify ffmpeg is available (skip for dummy instances)
         if not allow_dummy and not which("ffmpeg"):
@@ -110,7 +115,14 @@ class PlaylistGenerator:
                 "hostname": "your-server.com",
                 "username": "username",
                 "key_filename": "~/.ssh/id_rsa",
-                "remote_path": "/var/www/audio/"
+                "port": 22,
+                "remote_path": "/var/www/",
+                "audio_path": "public/audio",
+                "playlists_path": "public/playlists",
+                "styles_path": "public/styles"
+            },
+            "urls": {
+                "base_url": "https://your-server.com"
             },
             "output": {
                 "playlists_dir": "public/playlists",
@@ -309,6 +321,74 @@ class PlaylistGenerator:
             logger.debug(f"Could not extract cover art: {e}")
             return None
 
+    def measure_tempo(self, file_path: str) -> Optional[int]:
+        """Measure tempo of audio file using librosa."""
+        if not LIBROSA_AVAILABLE or librosa is None:
+            logger.warning(f"librosa not available, cannot measure tempo for {file_path}")
+            return None
+        
+        try:
+            logger.info(f"Measuring tempo for {file_path}...")
+            
+            # Load audio file
+            y, sr = librosa.load(file_path, sr=None)
+            
+            # Extract tempo using beat tracking
+            tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+            
+            # Add debug logging for tempo type and value
+            logger.debug(f"Tempo type: {type(tempo)}, value: {tempo}")
+            
+            # Handle both scalar and array cases
+            import numpy as np
+            if isinstance(tempo, np.ndarray) and tempo.size > 0:
+                tempo_value = float(tempo.item() if tempo.size == 1 else tempo[0])
+            else:
+                tempo_value = float(tempo)
+
+            measured_tempo = int(round(tempo_value))
+            
+            logger.info(f"Measured tempo: {measured_tempo} BPM for {file_path}")
+            return measured_tempo
+            
+        except Exception as e:
+            logger.error(f"Error measuring tempo for {file_path}: {e}")
+            return None
+    
+    def save_tempo_to_metadata(self, file_path: str, tempo: int) -> bool:
+        """Save measured tempo to the audio file's metadata."""
+        try:
+            logger.info(f"Saving measured tempo ({tempo} BPM) to {file_path}...")
+            
+            # Load the audio file for tag editing
+            audio_file = mutagen.File(file_path)  # type: ignore
+            if audio_file is None:
+                logger.warning(f"Could not open {file_path} for tempo tag writing")
+                return False
+            
+            # Ensure tags exist
+            if not hasattr(audio_file, 'tags') or audio_file.tags is None:
+                audio_file.add_tags()
+            
+            # Add the tempo based on file type
+            if hasattr(audio_file.tags, 'add'):
+                # For ID3 tags (MP3)
+                from mutagen.id3._frames import TBPM
+                audio_file.tags.add(TBPM(encoding=3, text=[str(tempo)]))
+            else:
+                # For other formats, try to add directly
+                audio_file.tags['BPM'] = str(tempo)
+            
+            # Save the changes
+            audio_file.save()
+            logger.info(f"Successfully saved tempo ({tempo} BPM) to {file_path}")
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Could not save tempo to {file_path}: {e}")
+            # Don't treat this as a fatal error, just log it
+            return False
+
     def validate_metadata(self, metadata: Dict, file_path: str) -> bool:
         """Validate that all required metadata is present."""
         missing_fields = []
@@ -320,7 +400,12 @@ class PlaylistGenerator:
         if not metadata.get("album"):
             missing_fields.append("album")
         if not metadata.get("tempo"):
-            missing_fields.append("tempo")
+            # Only require tempo if we're not skipping files without tempo
+            if self.skip_no_tempo:
+                logger.warning(f"Missing tempo in {file_path}, skipping due to --skip-no-tempo flag")
+                return False
+            else:
+                missing_fields.append("tempo")
         if metadata.get("duration") is None:
             missing_fields.append("duration")
         
@@ -346,7 +431,17 @@ class PlaylistGenerator:
             if image.mode != 'RGB':
                 image = image.convert('RGB')
             
-            image = image.resize((512, 512), Image.Resampling.LANCZOS)
+            # Use backward-compatible resampling method
+            try:
+                # Try newer PIL API first
+                image = image.resize((512, 512), Image.Resampling.LANCZOS)
+            except AttributeError:
+                # Fallback to older API - check if LANCZOS constant exists
+                if hasattr(Image, 'LANCZOS'):
+                    image = image.resize((512, 512), Image.LANCZOS)  # type: ignore
+                else:
+                    # Final fallback - use basic resize without resampling
+                    image = image.resize((512, 512))
             
             # Save as JPEG
             cover_path = os.path.join(temp_dir, cover_filename)
@@ -375,8 +470,39 @@ class PlaylistGenerator:
         
         return min_tempo, max_tempo
     
-    def upload_file_ssh(self, local_path: str, remote_filename: str) -> bool:
-        """Upload file to server via SSH."""
+    def create_remote_directory(self, sftp, remote_dir_path: str) -> bool:
+        """Create remote directory with proper permissions (755) if it doesn't exist."""
+        try:
+            # Try to stat the directory first
+            try:
+                sftp.stat(remote_dir_path)
+                logger.debug(f"Directory {remote_dir_path} already exists")
+                return True
+            except FileNotFoundError:
+                # Directory doesn't exist, create it
+                pass
+            
+            # Create parent directories recursively
+            parent_dir = os.path.dirname(remote_dir_path)
+            if parent_dir and parent_dir != remote_dir_path:
+                self.create_remote_directory(sftp, parent_dir)
+            
+            # Create the directory
+            logger.info(f"Creating remote directory: {remote_dir_path}")
+            sftp.mkdir(remote_dir_path)
+            
+            # Set permissions to 755
+            sftp.chmod(remote_dir_path, 0o755)
+            logger.debug(f"Set directory permissions to 755 for {remote_dir_path}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error creating remote directory {remote_dir_path}: {e}")
+            return False
+    
+    def upload_file_ssh(self, local_path: str, remote_filename: str, subfolder: str = "audio") -> bool:
+        """Upload file to server via SSH with automatic directory creation and proper permissions."""
         try:
             ssh_config = self.config["ssh"]
             
@@ -394,7 +520,23 @@ class PlaylistGenerator:
             
             sftp = ssh.open_sftp()
             
-            remote_path = os.path.join(ssh_config["remote_path"], remote_filename)
+            # Determine the target directory based on subfolder
+            if subfolder == "audio":
+                target_dir = os.path.join(ssh_config["remote_path"], ssh_config.get("audio_path", "public/audio"))
+            elif subfolder == "playlists":
+                target_dir = os.path.join(ssh_config["remote_path"], ssh_config.get("playlists_path", "public/playlists"))
+            elif subfolder == "styles":
+                target_dir = os.path.join(ssh_config["remote_path"], ssh_config.get("styles_path", "public/styles"))
+            else:
+                target_dir = os.path.join(ssh_config["remote_path"], subfolder)
+            
+            # Ensure target directory exists
+            if not self.create_remote_directory(sftp, target_dir):
+                sftp.close()
+                ssh.close()
+                return False
+            
+            remote_path = os.path.join(target_dir, remote_filename)
             
             # Check if file already exists
             try:
@@ -407,12 +549,33 @@ class PlaylistGenerator:
                 # File doesn't exist, proceed with upload
                 pass
             
+            # Add diagnostic logging
+            logger.info(f"Current working directory: {os.getcwd()}")
+            logger.info(f"Attempting to upload from: {local_path}")
+            logger.info(f"File exists check: {os.path.exists(local_path)}")
+            if os.path.exists(local_path):
+                logger.info(f"File size: {os.path.getsize(local_path)} bytes")
+            else:
+                # Try to find the file in different locations
+                logger.info("File not found, checking alternative paths...")
+                alt_paths = [
+                    os.path.join("scripts", local_path),
+                    os.path.join(os.getcwd(), "scripts", local_path),
+                    os.path.abspath(local_path)
+                ]
+                for alt_path in alt_paths:
+                    logger.info(f"Checking: {alt_path} -> exists: {os.path.exists(alt_path)}")
+            
             logger.info(f"Uploading {local_path} to {remote_path}...")
             sftp.put(local_path, remote_path)
             
+            # Set file permissions to 644
+            sftp.chmod(remote_path, 0o644)
+            logger.debug(f"Set file permissions to 644 for {remote_path}")
+            
             sftp.close()
             ssh.close()
-            logger.info(f"Successfully uploaded {remote_filename}")
+            logger.info(f"Successfully uploaded {remote_filename} to {subfolder} subfolder")
             return True
             
         except Exception as e:
@@ -467,10 +630,17 @@ class PlaylistGenerator:
                 playlist["minTempo"] = min_tempo
                 playlist["maxTempo"] = max_tempo
                 
-                # Save playlist
+                # Save playlist locally
                 os.makedirs(os.path.dirname(playlist_file), exist_ok=True)
                 with open(playlist_file, 'w') as f:
                     json.dump(playlist, f, indent=2)
+                
+                # Upload playlist to remote server
+                playlist_filename = f"{self.playlist_name}.json"
+                if self.upload_file_ssh(playlist_file, playlist_filename, "playlists"):
+                    logger.info(f"Uploaded playlist {playlist_filename} to remote server")
+                else:
+                    logger.warning(f"Failed to upload playlist {playlist_filename} to remote server")
                 
                 logger.info(f"Added song to playlist {self.playlist_name} (tempo range: {min_tempo}-{max_tempo} BPM)")
                 return True
@@ -516,10 +686,17 @@ class PlaylistGenerator:
                         "description": f"Auto-generated playlist for {playlist['name']}"
                     })
                     
-                    # Save style file
+                    # Save style file locally
                     os.makedirs(os.path.dirname(style_file), exist_ok=True)
                     with open(style_file, 'w') as f:
                         json.dump(style_data, f, indent=2)
+                    
+                    # Upload style file to remote server
+                    style_filename = f"{self.style}.json"
+                    if self.upload_file_ssh(style_file, style_filename, "styles"):
+                        logger.info(f"Uploaded style file {style_filename} to remote server")
+                    else:
+                        logger.warning(f"Failed to upload style file {style_filename} to remote server")
                     
                     logger.info(f"Updated style file {self.style} with playlist {self.playlist_name}")
                     return True
@@ -592,7 +769,36 @@ class PlaylistGenerator:
             # Extract metadata first
             metadata = self.extract_metadata(input_file)
             
-            # Validate required metadata
+            # Handle missing tempo
+            if not metadata.get("tempo"):
+                if self.skip_no_tempo:
+                    logger.warning(f"Skipping {input_file} due to missing tempo (--skip-no-tempo enabled)")
+                    self.skipped_files.append(input_file)
+                    return
+                else:
+                    # Try to measure tempo
+                    logger.info(f"No tempo found in metadata for {input_file}, attempting to measure...")
+                    measured_tempo = self.measure_tempo(input_file)
+                    
+                    if measured_tempo:
+                        # Update metadata with measured tempo
+                        metadata["tempo"] = measured_tempo
+                        
+                        # Save tempo back to the original file
+                        if self.save_tempo_to_metadata(input_file, measured_tempo):
+                            self.tempo_measured_files.append({
+                                "file": input_file,
+                                "measured_tempo": measured_tempo
+                            })
+                            logger.info(f"Successfully measured and saved tempo ({measured_tempo} BPM) for {input_file}")
+                        else:
+                            logger.warning(f"Measured tempo ({measured_tempo} BPM) but failed to save to {input_file}")
+                    else:
+                        logger.error(f"Failed to measure tempo for {input_file}")
+                        self.metadata_errors.append(f"Could not measure tempo for {input_file}")
+                        return
+            
+            # Validate required metadata (after potential tempo measurement)
             if not self.validate_metadata(metadata, input_file):
                 return
             
@@ -617,7 +823,7 @@ class PlaylistGenerator:
             remote_filename = f"{fingerprint_hash}.mp3"
             
             # Upload audio file to server
-            if not self.upload_file_ssh(working_file, remote_filename):
+            if not self.upload_file_ssh(working_file, remote_filename, "audio"):
                 return
             
             # Handle cover image
@@ -627,15 +833,17 @@ class PlaylistGenerator:
                 cover_path = self.save_cover_image(metadata["cover_data"], cover_filename, temp_dir)
                 if cover_path:
                     # Upload cover image
-                    if self.upload_file_ssh(cover_path, cover_filename):
-                        cover_url = f"https://{self.config['ssh']['hostname']}/audio/{cover_filename}"
+                    if self.upload_file_ssh(cover_path, cover_filename, "audio"):
+                        # Use base URL from config
+                        base_url = self.config.get("urls", {}).get("base_url", f"https://{self.config['ssh']['hostname']}")
+                        audio_path = self.config["ssh"].get("audio_path", "public/audio")
+                        cover_url = f"{base_url.rstrip('/')}/{audio_path.strip('/')}/{cover_filename}"
                         os.remove(cover_path)  # Clean up temp cover file
             
-            # Create audio URL
-            audio_url = f"{self.config['ssh']['remote_path'].rstrip('/')}/{remote_filename}"
-            if not audio_url.startswith('http'):
-                # Assume it's a relative path and construct URL
-                audio_url = f"https://{self.config['ssh']['hostname']}/audio/{remote_filename}"
+            # Create audio URL using base URL from config
+            base_url = self.config.get("urls", {}).get("base_url", f"https://{self.config['ssh']['hostname']}")
+            audio_path = self.config["ssh"].get("audio_path", "public/audio")
+            audio_url = f"{base_url.rstrip('/')}/{audio_path.strip('/')}/{remote_filename}"
             
             # Create playlist entry
             song_entry = self.create_playlist_entry(metadata, fingerprint_hash, audio_url, cover_url)
@@ -670,12 +878,18 @@ Playlist Generation Summary
 
 Successfully added tracks: {len(self.processed_files)}
 Files skipped (duplicates): {len(self.skipped_files)}
+Tempo measurements performed: {len(self.tempo_measured_files)}
 Metadata errors: {len(self.metadata_errors)}
 Processing errors: {len(self.errors)}
 
 Style: {self.style}
 Playlist: {self.playlist_name}
 """
+        
+        if self.tempo_measured_files:
+            summary += "\nTempo Measurements:\n"
+            for entry in self.tempo_measured_files:
+                summary += f"  ♪ {entry['file']}: {entry['measured_tempo']} BPM\n"
         
         if self.metadata_errors:
             summary += "\nMetadata Errors:\n"
@@ -698,6 +912,7 @@ def main():
     parser.add_argument("--style", help="Music style (e.g., bachata, salsa, west_coast_swing)")
     parser.add_argument("--playlist", help="Playlist name")
     parser.add_argument("--recalculate-tempos", action="store_true", help="Recalculate tempo ranges for all existing playlists without processing new files")
+    parser.add_argument("--skip-no-tempo", action="store_true", help="Skip songs that don't have tempo in metadata instead of measuring tempo")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
     
     args = parser.parse_args()
@@ -729,19 +944,12 @@ def main():
             logger.error(f"Input directory does not exist: {args.input_dir}")
             sys.exit(1)
         
-        generator = PlaylistGenerator(args.config, args.style, args.playlist)
+        generator = PlaylistGenerator(args.config, args.style, args.playlist, skip_no_tempo=args.skip_no_tempo)
         generator.process_directory(args.input_dir, args.temp_dir)
         
         # Generate and print summary
         summary = generator.generate_summary()
         print(summary)
-        
-        # Save summary to file
-        summary_file = f"playlist_generation_summary_{int(time.time())}.txt"
-        with open(summary_file, 'w') as f:
-            f.write(summary)
-        
-        logger.info(f"Summary saved to {summary_file}")
         
     except Exception as e:
         logger.error(f"Fatal error: {e}")

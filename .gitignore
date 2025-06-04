@@ -43,3 +43,4 @@ next-env.d.ts
 *.sw?
 scripts/config.json
 scripts/__pycache__/
+scripts/temp_audio/

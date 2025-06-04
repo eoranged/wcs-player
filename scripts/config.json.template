@@ -6,7 +6,14 @@
     "hostname": "your-server.com",
     "username": "username",
     "key_filename": "~/.ssh/id_rsa",
-    "remote_path": "/var/www/audio/"
+    "port": 22,
+    "remote_path": "/var/www/",
+    "audio_path": "public/audio",
+    "playlists_path": "public/playlists",
+    "styles_path": "public/styles"
+  },
+  "urls": {
+    "base_url": "https://your-server.com"
   },
   "output": {
     "playlists_dir": "public/playlists",

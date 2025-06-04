@@ -1,6 +1,9 @@
 # Audio processing
 pydub>=0.25.1
 
+# Audio analysis and tempo measurement
+librosa>=0.10.0
+
 # Metadata extraction
 mutagen>=1.46.0
 
