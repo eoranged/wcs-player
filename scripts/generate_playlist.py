@@ -501,6 +501,89 @@ class PlaylistGenerator:
             logger.error(f"Error creating remote directory {remote_dir_path}: {e}")
             return False
     
+    def upload_public_directory(self) -> bool:
+        """Upload entire public directory to the server preserving directory structure."""
+        try:
+            public_dir = "public"
+            if not os.path.exists(public_dir):
+                logger.warning(f"Public directory {public_dir} does not exist, skipping upload")
+                return True
+            
+            logger.info("Uploading public directory to server...")
+            
+            ssh_config = self.config["ssh"]
+            
+            ssh = SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            
+            # Connect using key file
+            key_path = os.path.expanduser(ssh_config["key_filename"])
+            ssh.connect(
+                hostname=ssh_config["hostname"],
+                username=ssh_config["username"],
+                port=ssh_config["port"],
+                key_filename=key_path,
+            )
+            
+            sftp = ssh.open_sftp()
+            
+            # Get the base remote path
+            remote_base_path = ssh_config["remote_path"]
+            
+            uploaded_count = 0
+            skipped_count = 0
+            error_count = 0
+            
+            # Walk through the public directory recursively
+            for root, dirs, files in os.walk(public_dir):
+                # Create the corresponding remote directory structure
+                relative_path = os.path.relpath(root, ".")
+                remote_dir_path = os.path.join(remote_base_path, relative_path).replace("\\", "/")
+                
+                # Ensure remote directory exists
+                if not self.create_remote_directory(sftp, remote_dir_path):
+                    logger.error(f"Failed to create remote directory: {remote_dir_path}")
+                    error_count += 1
+                    continue
+                
+                # Upload all files in this directory
+                for file in files:
+                    local_file_path = os.path.join(root, file)
+                    remote_file_path = os.path.join(remote_dir_path, file).replace("\\", "/")
+                    
+                    try:
+                        # Check if file already exists on remote server
+                        try:
+                            sftp.stat(remote_file_path)
+                            logger.debug(f"File {remote_file_path} already exists, skipping")
+                            skipped_count += 1
+                            continue
+                        except FileNotFoundError:
+                            # File doesn't exist, proceed with upload
+                            pass
+                        
+                        logger.info(f"Uploading {local_file_path} to {remote_file_path}")
+                        sftp.put(local_file_path, remote_file_path)
+                        
+                        # Set file permissions to 644
+                        sftp.chmod(remote_file_path, 0o644)
+                        uploaded_count += 1
+                        
+                    except Exception as e:
+                        logger.error(f"Error uploading {local_file_path}: {e}")
+                        error_count += 1
+            
+            sftp.close()
+            ssh.close()
+            
+            logger.info(f"Public directory upload complete: {uploaded_count} uploaded, {skipped_count} skipped, {error_count} errors")
+            return error_count == 0
+            
+        except Exception as e:
+            logger.error(f"Error uploading public directory: {e}")
+            self.errors.append(f"Public directory upload error: {e}")
+            return False
+    
     def upload_file_ssh(self, local_path: str, remote_filename: str, subfolder: str = "audio") -> bool:
         """Upload file to server via SSH with automatic directory creation and proper permissions."""
         try:
@@ -913,6 +996,7 @@ def main():
     parser.add_argument("--playlist", help="Playlist name")
     parser.add_argument("--recalculate-tempos", action="store_true", help="Recalculate tempo ranges for all existing playlists without processing new files")
     parser.add_argument("--skip-no-tempo", action="store_true", help="Skip songs that don't have tempo in metadata instead of measuring tempo")
+    parser.add_argument("--upload-public", action="store_true", help="Upload all files from public directory to server")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
     
     args = parser.parse_args()
@@ -921,6 +1005,17 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
     
     try:
+        if args.upload_public:
+            # Only upload public directory without processing new files
+            logger.info("Uploading public directory to server...")
+            dummy_generator = PlaylistGenerator(args.config, "dummy", "dummy", allow_dummy=True)
+            if dummy_generator.upload_public_directory():
+                logger.info("Public directory upload complete!")
+            else:
+                logger.error("Public directory upload failed!")
+                sys.exit(1)
+            return
+        
         if args.recalculate_tempos:
             # Only recalculate tempo ranges without processing new files
             logger.info("Recalculating tempo ranges for all existing playlists...")

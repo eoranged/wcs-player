@@ -7,6 +7,7 @@ const { i18n } = require('./next-i18next.config.js');
 // Base configuration
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   images: {
     unoptimized: true,
   },

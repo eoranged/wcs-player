@@ -1,14 +1,36 @@
 /**
- * Fetches data from local JSON files instead of API
- * @param {string} path - The path to the JSON file
+ * Get the base URL for a resource type from environment variables
+ * @param {string} resourceType - The type of resource ('styles', 'playlists', 'audio')
+ * @returns {string} - The base URL or empty string for local files
+ */
+const getBaseUrl = (resourceType) => {
+  switch (resourceType) {
+    case 'styles':
+      return process.env.NEXT_PUBLIC_STYLES_BASE_URL || '';
+    case 'playlists':
+      return process.env.NEXT_PUBLIC_PLAYLISTS_BASE_URL || '';
+    case 'audio':
+      return process.env.NEXT_PUBLIC_AUDIO_BASE_URL || '';
+    default:
+      return '';
+  }
+};
+
+/**
+ * Fetches data from JSON files (local or remote based on environment variables)
+ * @param {string} path - The path to the JSON file (relative)
+ * @param {string} resourceType - The type of resource ('styles', 'playlists')
  * @returns {Promise<Object>} - The parsed JSON response
  * @throws {Error} - If the request fails
  */
-export const fetchLocalJson = async (path) => {
+export const fetchJson = async (path, resourceType = '') => {
   try {
-    console.log(`Fetching local JSON file: ${path}`);
+    const baseUrl = getBaseUrl(resourceType);
+    const fullUrl = baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path;
     
-    const response = await fetch(path);
+    console.log(`Fetching JSON file: ${fullUrl} (base: ${baseUrl || 'local'})`);
+    
+    const response = await fetch(fullUrl);
     
     if (!response.ok) {
       const error = new Error(`HTTP error! status: ${response.status}`);
@@ -17,13 +39,19 @@ export const fetchLocalJson = async (path) => {
     }
 
     const data = await response.json();
-    console.log(`Local JSON data loaded:`, data);
+    console.log(`JSON data loaded:`, data);
     return data;
   } catch (error) {
-    console.error(`Error fetching local JSON from ${path}:`, error);
+    console.error(`Error fetching JSON from ${path}:`, error);
     throw error;
   }
 };
+
+/**
+ * Legacy function for backward compatibility
+ * @deprecated Use fetchJson instead
+ */
+export const fetchLocalJson = fetchJson;
 
 /**
  * Fetches the music library for a specific playlist
@@ -34,8 +62,8 @@ export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
   try {
     console.log(`Fetching music library for playlist: ${playlistId}`);
     
-    // Use local JSON file for the playlist
-    const data = await fetchLocalJson(`/playlists/${playlistId}.json`);
+    // Use JSON file for the playlist with playlists base URL
+    const data = await fetchJson(`/playlists/${playlistId}.json`, 'playlists');
     
     // Validate the data structure
     if (!data || !data.songs) {
@@ -54,6 +82,15 @@ export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
       console.log(`Successfully fetched music library with ${data.songs.length} songs:`);
       // Log the first song to verify structure
       console.log('First song:', data.songs[0]);
+    }
+    
+    // Process audio URLs to use base URL if configured
+    const audioBaseUrl = getBaseUrl('audio');
+    if (audioBaseUrl) {
+      data.songs = data.songs.map(song => ({
+        ...song,
+        audio: song.audio.startsWith('http') ? song.audio : `${audioBaseUrl.replace(/\/$/, '')}${song.audio}`
+      }));
     }
     
     return data.songs;
@@ -98,8 +135,8 @@ export const fetchPlaylists = async (style = 'West Coast Swing') => {
     // Convert style name to filename format
     const styleFileName = style.toLowerCase().replace(/ /g, '_');
     
-    // Use local JSON file for the style
-    const data = await fetchLocalJson(`/styles/${styleFileName}.json`);
+    // Use JSON file for the style with styles base URL
+    const data = await fetchJson(`/styles/${styleFileName}.json`, 'styles');
     
     // Validate the data structure
     if (!data || !data.playlists) {
@@ -119,3 +156,29 @@ export const fetchPlaylists = async (style = 'West Coast Swing') => {
     return [];
   }
 };
+
+/**
+ * Processes audio URL to use base URL if configured
+ * @param {string} audioUrl - The original audio URL
+ * @returns {string} - The processed audio URL
+ */
+export const processAudioUrl = (audioUrl) => {
+  if (!audioUrl) return '';
+  
+  // If it's already a full URL, return as-is
+  if (audioUrl.startsWith('http')) {
+    return audioUrl;
+  }
+  
+  const audioBaseUrl = getBaseUrl('audio');
+  if (audioBaseUrl) {
+    return `${audioBaseUrl.replace(/\/$/, '')}${audioUrl}`;
+  }
+  
+  return audioUrl;
+};
+
+/**
+ * Export getBaseUrl function for use in other parts of the application
+ */
+export { getBaseUrl };

@@ -18,7 +18,12 @@ export default function handler(req, res) {
       features: {
         debugPanel: false
       },
-      env: process.env.NODE_ENV || 'production'
+      env: process.env.NODE_ENV || 'production',
+      baseUrls: {
+        styles: process.env.NEXT_PUBLIC_STYLES_BASE_URL || '',
+        playlists: process.env.NEXT_PUBLIC_PLAYLISTS_BASE_URL || '',
+        audio: process.env.NEXT_PUBLIC_AUDIO_BASE_URL || ''
+      }
     };
     
     // Check if user is admin by ID match

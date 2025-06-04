@@ -24,7 +24,11 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env.local
 .env
+
+# Ignore production env with actual secrets (use .env.production.local instead)
+.env.production.local
 
 # vercel
 .vercel
