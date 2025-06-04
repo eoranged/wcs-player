@@ -20,10 +20,6 @@ services:
       retries: 3
       start_period: 40s
     volumes:
-      # Mount playlists directory for dynamic updates
-      - ./public/playlists:/app/public/playlists:ro
-      # Mount styles directory for dynamic updates
-      - ./public/styles:/app/public/styles:ro
       # Optional: Mount logs directory
       - ./logs:/app/logs
     networks:

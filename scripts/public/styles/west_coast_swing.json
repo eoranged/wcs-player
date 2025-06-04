@@ -1,0 +1,12 @@
+{
+  "style": "West Coast Swing",
+  "playlists": [
+    {
+      "id": "Random WCS",
+      "name": "Random Wcs",
+      "minTempo": 74,
+      "maxTempo": 74,
+      "description": "Auto-generated playlist for Random Wcs"
+    }
+  ]
+}

@@ -1,8 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { processAudioUrl } from '../../utils/api';
+import { fetchJson, processAudioUrl } from '../../utils/api';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Set content type before any response is sent
   res.setHeader('Content-Type', 'application/json');
   
@@ -11,16 +9,36 @@ export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   
   try {
-    // Load all songs from playlist files
-    const playlistsDir = path.join(process.cwd(), 'public', 'playlists');
-    const playlistFiles = fs.readdirSync(playlistsDir).filter(file => file.endsWith('.json'));
+    // Check if base URL is configured
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      return res.status(500).json({
+        error: 'NEXT_PUBLIC_BASE_URL is required but not configured'
+      });
+    }
+
+    // List of known playlist files (this could be made dynamic in the future)
+    const playlistFiles = [
+      'bachata_moderna.json',
+      'bachata_sensual.json',
+      'bachata_traditional.json',
+      'salsa_cubana.json',
+      'salsa_linea.json',
+      'salsa_romantica.json',
+      'wcs_advanced.json',
+      'wcs_beginner.json',
+      'wcs_classics.json',
+      'wcs_competitions.json',
+      'wcs_contemporary.json',
+      'wcs_intermediate.json',
+      'wcs_showcase.json'
+    ];
     
     const musicLibrary = [];
     
     for (const file of playlistFiles) {
       try {
-        const filePath = path.join(playlistsDir, file);
-        const playlistData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const playlistData = await fetchJson(`/playlists/${file}`);
         
         if (playlistData.songs && Array.isArray(playlistData.songs)) {
           // Process each song and add to music library

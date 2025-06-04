@@ -1,0 +1,1029 @@
+{
+  "id": "Random WCS",
+  "name": "Random Wcs",
+  "style": "West Coast Swing",
+  "songs": [
+    {
+      "id": "615cbe7e4201a0f7ef30aa0e808b60df3a0fe99b",
+      "title": "If the World Was Ending (feat. Julia Michaels)",
+      "artist": "JP Saxe & Julia Michaels",
+      "album": "If the World Was Ending (feat. Julia Michaels)",
+      "tempo": 74,
+      "duration": 208,
+      "audio": "https://wcscdn.ru/public/audio/615cbe7e4201a0f7ef30aa0e808b60df3a0fe99b.mp3",
+      "cover": "https://wcscdn.ru/public/audio/615cbe7e4201a0f7ef30aa0e808b60df3a0fe99b.jpg"
+    },
+    {
+      "id": "085fe57ce0c4c89c5b0f41079a9043d5aff331db",
+      "title": "Good Enough",
+      "artist": "The Ready Set",
+      "album": "Good Enough",
+      "tempo": 126,
+      "duration": 193,
+      "audio": "https://wcscdn.ru/public/audio/085fe57ce0c4c89c5b0f41079a9043d5aff331db.mp3",
+      "cover": "https://wcscdn.ru/public/audio/085fe57ce0c4c89c5b0f41079a9043d5aff331db.jpg"
+    },
+    {
+      "id": "ffbff0218b585eaed9cec9d9a80e8a10225077cb",
+      "title": "No Words - Kasbo Remix",
+      "artist": "Erik Hassle & Carl Garsbo",
+      "album": "No Words (Remixes)",
+      "tempo": 115,
+      "duration": 307,
+      "audio": "https://wcscdn.ru/public/audio/ffbff0218b585eaed9cec9d9a80e8a10225077cb.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ffbff0218b585eaed9cec9d9a80e8a10225077cb.jpg"
+    },
+    {
+      "id": "daa4fa5530eba7891a9f4c9311d304cd2bcc349c",
+      "title": "Stuff Like That There",
+      "artist": "Bette Midler",
+      "album": "For the Boys (Music from the Motion Picture)",
+      "tempo": 157,
+      "duration": 170,
+      "audio": "https://wcscdn.ru/public/audio/daa4fa5530eba7891a9f4c9311d304cd2bcc349c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/daa4fa5530eba7891a9f4c9311d304cd2bcc349c.jpg"
+    },
+    {
+      "id": "83130f0aef1fa085b3120911f50c1113a4904253",
+      "title": "Feel Good",
+      "artist": "Empire Cast & Katlynn Simone",
+      "album": "Empire (Season 6, Heart of Stone) [Music from the TV Series]",
+      "tempo": 146,
+      "duration": 145,
+      "audio": "https://wcscdn.ru/public/audio/83130f0aef1fa085b3120911f50c1113a4904253.mp3",
+      "cover": "https://wcscdn.ru/public/audio/83130f0aef1fa085b3120911f50c1113a4904253.jpg"
+    },
+    {
+      "id": "f6d91ec138870c12cc7440f24a0ca56f65144d72",
+      "title": "No Scrubs",
+      "artist": "Campsite Dream",
+      "album": "No Scrubs",
+      "tempo": 105,
+      "duration": 139,
+      "audio": "https://wcscdn.ru/public/audio/f6d91ec138870c12cc7440f24a0ca56f65144d72.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f6d91ec138870c12cc7440f24a0ca56f65144d72.jpg"
+    },
+    {
+      "id": "80d1bc4accb1b2d6d7a59a9616cf11b61858eb7e",
+      "title": "Little Do You Know",
+      "artist": "Campsite Dream",
+      "album": "Little Do You Know",
+      "tempo": 94,
+      "duration": 168,
+      "audio": "https://wcscdn.ru/public/audio/80d1bc4accb1b2d6d7a59a9616cf11b61858eb7e.mp3",
+      "cover": "https://wcscdn.ru/public/audio/80d1bc4accb1b2d6d7a59a9616cf11b61858eb7e.jpg"
+    },
+    {
+      "id": "0a31a86b5d8131792844604f5f638063ecd38f8f",
+      "title": "Try Again",
+      "artist": "Campsite Dream",
+      "album": "Try Again",
+      "tempo": 92,
+      "duration": 194,
+      "audio": "https://wcscdn.ru/public/audio/0a31a86b5d8131792844604f5f638063ecd38f8f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0a31a86b5d8131792844604f5f638063ecd38f8f.jpg"
+    },
+    {
+      "id": "dbddcb978a34ac382a21aa227028e5c2e5f4d808",
+      "title": "Save Tonight",
+      "artist": "Campsite Dream",
+      "album": "Save Tonight",
+      "tempo": 118,
+      "duration": 198,
+      "audio": "https://wcscdn.ru/public/audio/dbddcb978a34ac382a21aa227028e5c2e5f4d808.mp3",
+      "cover": "https://wcscdn.ru/public/audio/dbddcb978a34ac382a21aa227028e5c2e5f4d808.jpg"
+    },
+    {
+      "id": "0b8f4638ec67634342c68935e27a9b1a0b9559e3",
+      "title": "September",
+      "artist": "Campsite Dream",
+      "album": "September",
+      "tempo": 110,
+      "duration": 185,
+      "audio": "https://wcscdn.ru/public/audio/0b8f4638ec67634342c68935e27a9b1a0b9559e3.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0b8f4638ec67634342c68935e27a9b1a0b9559e3.jpg"
+    },
+    {
+      "id": "35392496002123f260c3c056811c61a84c1b19f1",
+      "title": "Jewel (feat. Nikki Vianna)",
+      "artist": "Cash Cash & Nikki Vianna",
+      "album": "Jewel (feat. Nikki Vianna)",
+      "tempo": 77,
+      "duration": 178,
+      "audio": "https://wcscdn.ru/public/audio/35392496002123f260c3c056811c61a84c1b19f1.mp3",
+      "cover": "https://wcscdn.ru/public/audio/35392496002123f260c3c056811c61a84c1b19f1.jpg"
+    },
+    {
+      "id": "4b9337983aed8b2354f01408d54cd85185a155b8",
+      "title": "No One Compares To You",
+      "artist": "Jack & Jack",
+      "album": "No One Compares To You",
+      "tempo": 111,
+      "duration": 182,
+      "audio": "https://wcscdn.ru/public/audio/4b9337983aed8b2354f01408d54cd85185a155b8.mp3",
+      "cover": "https://wcscdn.ru/public/audio/4b9337983aed8b2354f01408d54cd85185a155b8.jpg"
+    },
+    {
+      "id": "bbb2775acd5bb6bcb20beda220e63071f2fb8b3c",
+      "title": "Stuck On a Feeling",
+      "artist": "Prince Royce & Snoop Dogg",
+      "album": "Stuck On a Feeling",
+      "tempo": 100,
+      "duration": 210,
+      "audio": "https://wcscdn.ru/public/audio/bbb2775acd5bb6bcb20beda220e63071f2fb8b3c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/bbb2775acd5bb6bcb20beda220e63071f2fb8b3c.jpg"
+    },
+    {
+      "id": "9272de7593c246378c7e766a7a364d7843f14f1c",
+      "title": "Double Vision (feat. Tyga)",
+      "artist": "Prince Royce & Tyga",
+      "album": "Double Vision (Deluxe Edition)",
+      "tempo": 100,
+      "duration": 215,
+      "audio": "https://wcscdn.ru/public/audio/9272de7593c246378c7e766a7a364d7843f14f1c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/9272de7593c246378c7e766a7a364d7843f14f1c.jpg"
+    },
+    {
+      "id": "b9f98791e4bd08e9f6034b4c6ac1ff24602620f7",
+      "title": "Handcuffs",
+      "artist": "Prince Royce",
+      "album": "Handcuffs",
+      "tempo": 74,
+      "duration": 221,
+      "audio": "https://wcscdn.ru/public/audio/b9f98791e4bd08e9f6034b4c6ac1ff24602620f7.mp3",
+      "cover": "https://wcscdn.ru/public/audio/b9f98791e4bd08e9f6034b4c6ac1ff24602620f7.jpg"
+    },
+    {
+      "id": "2906664977fdea745abc96cd724f8123b30fa46e",
+      "title": "Heaven",
+      "artist": "Julia Michaels",
+      "album": "Heaven [From \"Fifty Shades Freed (Original Motion Picture Soundtrack)\"]",
+      "tempo": 99,
+      "duration": 191,
+      "audio": "https://wcscdn.ru/public/audio/2906664977fdea745abc96cd724f8123b30fa46e.mp3",
+      "cover": "https://wcscdn.ru/public/audio/2906664977fdea745abc96cd724f8123b30fa46e.jpg"
+    },
+    {
+      "id": "2697b4f4a28ec598a7e358b0e1585450c43fa589",
+      "title": "Falling For Boys",
+      "artist": "Julia Michaels",
+      "album": "Inner Monologue Part 2",
+      "tempo": 73,
+      "duration": 183,
+      "audio": "https://wcscdn.ru/public/audio/2697b4f4a28ec598a7e358b0e1585450c43fa589.mp3",
+      "cover": "https://wcscdn.ru/public/audio/2697b4f4a28ec598a7e358b0e1585450c43fa589.jpg"
+    },
+    {
+      "id": "88d71189caabc89ebe67d68f29d00d6cf348e4cf",
+      "title": "Issues",
+      "artist": "Julia Michaels",
+      "album": "Issues",
+      "tempo": 114,
+      "duration": 176,
+      "audio": "https://wcscdn.ru/public/audio/88d71189caabc89ebe67d68f29d00d6cf348e4cf.mp3",
+      "cover": "https://wcscdn.ru/public/audio/88d71189caabc89ebe67d68f29d00d6cf348e4cf.jpg"
+    },
+    {
+      "id": "eabad12503f7f3b348360b137394f255aad11492",
+      "title": "Let It Go",
+      "artist": "James Bay",
+      "album": "Chaos And The Calm",
+      "tempo": 147,
+      "duration": 260,
+      "audio": "https://wcscdn.ru/public/audio/eabad12503f7f3b348360b137394f255aad11492.mp3",
+      "cover": "https://wcscdn.ru/public/audio/eabad12503f7f3b348360b137394f255aad11492.jpg"
+    },
+    {
+      "id": "2265ef0a5ef261eb87b488119e6fad241d826f5c",
+      "title": "Crazy in Love",
+      "artist": "Sofia Karlberg",
+      "album": "Crazy in Love - Single",
+      "tempo": 119,
+      "duration": 190,
+      "audio": "https://wcscdn.ru/public/audio/2265ef0a5ef261eb87b488119e6fad241d826f5c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/2265ef0a5ef261eb87b488119e6fad241d826f5c.jpg"
+    },
+    {
+      "id": "641c7a92bdee8ac3dd33f2337c985077754f368c",
+      "title": "Runnin (Lose it All)",
+      "artist": "Sofia Karlberg",
+      "album": "Runnin (Lose it All)",
+      "tempo": 70,
+      "duration": 205,
+      "audio": "https://wcscdn.ru/public/audio/641c7a92bdee8ac3dd33f2337c985077754f368c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/641c7a92bdee8ac3dd33f2337c985077754f368c.jpg"
+    },
+    {
+      "id": "39a8857105781035d949848913ba3e20b68e5a61",
+      "title": "If I Were Sorry",
+      "artist": "Frans",
+      "album": "If I Were Sorry",
+      "tempo": 105,
+      "duration": 184,
+      "audio": "https://wcscdn.ru/public/audio/39a8857105781035d949848913ba3e20b68e5a61.mp3",
+      "cover": "https://wcscdn.ru/public/audio/39a8857105781035d949848913ba3e20b68e5a61.jpg"
+    },
+    {
+      "id": "ff15b5f23e01ec6b209465b535fe3c11692da173",
+      "title": "touch me - remix",
+      "artist": "Afgan & Robin Thicke",
+      "album": "touch me (remix)",
+      "tempo": 100,
+      "duration": 180,
+      "audio": "https://wcscdn.ru/public/audio/ff15b5f23e01ec6b209465b535fe3c11692da173.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ff15b5f23e01ec6b209465b535fe3c11692da173.jpg"
+    },
+    {
+      "id": "12374ad220f196da9ada089048d1373c3a4bd9f4",
+      "title": "Tattoo (How 'Bout You)",
+      "artist": "In Real Life",
+      "album": "Tattoo (How 'Bout You)",
+      "tempo": 108,
+      "duration": 229,
+      "audio": "https://wcscdn.ru/public/audio/12374ad220f196da9ada089048d1373c3a4bd9f4.mp3",
+      "cover": "https://wcscdn.ru/public/audio/12374ad220f196da9ada089048d1373c3a4bd9f4.jpg"
+    },
+    {
+      "id": "29f00847cc259cbf406057acaf7366b8c921ad9f",
+      "title": "Tequilawine",
+      "artist": "Olivia O'Brien",
+      "album": "It's Not That Deep",
+      "tempo": 140,
+      "duration": 206,
+      "audio": "https://wcscdn.ru/public/audio/29f00847cc259cbf406057acaf7366b8c921ad9f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/29f00847cc259cbf406057acaf7366b8c921ad9f.jpg"
+    },
+    {
+      "id": "893fcec06da1569003788db00250d920b2ffd18e",
+      "title": "Shy",
+      "artist": "Jai Waetford",
+      "album": "Shy - EP",
+      "tempo": 74,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/893fcec06da1569003788db00250d920b2ffd18e.mp3",
+      "cover": "https://wcscdn.ru/public/audio/893fcec06da1569003788db00250d920b2ffd18e.jpg"
+    },
+    {
+      "id": "0a17668fd214d462823b2039fc642a5812a19d57",
+      "title": "Anybody Else",
+      "artist": "Faouzia",
+      "album": "CITIZENS",
+      "tempo": 138,
+      "duration": 201,
+      "audio": "https://wcscdn.ru/public/audio/0a17668fd214d462823b2039fc642a5812a19d57.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0a17668fd214d462823b2039fc642a5812a19d57.jpg"
+    },
+    {
+      "id": "41f31bb74f69c4fbe2f98b166094daf11c8d77e3",
+      "title": "Easy On Me",
+      "artist": "Adele",
+      "album": "Easy On Me",
+      "tempo": 70,
+      "duration": 224,
+      "audio": "https://wcscdn.ru/public/audio/41f31bb74f69c4fbe2f98b166094daf11c8d77e3.mp3",
+      "cover": "https://wcscdn.ru/public/audio/41f31bb74f69c4fbe2f98b166094daf11c8d77e3.jpg"
+    },
+    {
+      "id": "f490c2b77b3731cf856de7680f93d532fbe04ba5",
+      "title": "Make You Feel My Love",
+      "artist": "Adele",
+      "album": "19",
+      "tempo": 76,
+      "duration": 212,
+      "audio": "https://wcscdn.ru/public/audio/f490c2b77b3731cf856de7680f93d532fbe04ba5.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f490c2b77b3731cf856de7680f93d532fbe04ba5.jpg"
+    },
+    {
+      "id": "2ba65f0cb18143c78216e1ab15e4a7ec24b0eafb",
+      "title": "Hello",
+      "artist": "Adele",
+      "album": "Hello",
+      "tempo": 79,
+      "duration": 295,
+      "audio": "https://wcscdn.ru/public/audio/2ba65f0cb18143c78216e1ab15e4a7ec24b0eafb.mp3",
+      "cover": "https://wcscdn.ru/public/audio/2ba65f0cb18143c78216e1ab15e4a7ec24b0eafb.jpg"
+    },
+    {
+      "id": "ac7b00187e5c50ad7cd8b081470fc109268a9c35",
+      "title": "All I Ask",
+      "artist": "Adele",
+      "album": "25",
+      "tempo": 71,
+      "duration": 271,
+      "audio": "https://wcscdn.ru/public/audio/ac7b00187e5c50ad7cd8b081470fc109268a9c35.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ac7b00187e5c50ad7cd8b081470fc109268a9c35.jpg"
+    },
+    {
+      "id": "1bf38b6175ef80616e59435f772e58421907a916",
+      "title": "When We Were Young",
+      "artist": "Adele",
+      "album": "25",
+      "tempo": 71,
+      "duration": 290,
+      "audio": "https://wcscdn.ru/public/audio/1bf38b6175ef80616e59435f772e58421907a916.mp3",
+      "cover": "https://wcscdn.ru/public/audio/1bf38b6175ef80616e59435f772e58421907a916.jpg"
+    },
+    {
+      "id": "f88dd78f28c40d690cf38b7845a948ca6e9483a6",
+      "title": "Cut Your Teeth - Kygo Remix",
+      "artist": "Kyla La Grange & Kygo",
+      "album": "Cut Your Teeth (Kygo Remix)",
+      "tempo": 100,
+      "duration": 396,
+      "audio": "https://wcscdn.ru/public/audio/f88dd78f28c40d690cf38b7845a948ca6e9483a6.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f88dd78f28c40d690cf38b7845a948ca6e9483a6.jpg"
+    },
+    {
+      "id": "59fe53c770dd9c9bf07757352eafd62835e28ca6",
+      "title": "Closer",
+      "artist": "The Chainsmokers & Halsey",
+      "album": "Closer",
+      "tempo": 95,
+      "duration": 245,
+      "audio": "https://wcscdn.ru/public/audio/59fe53c770dd9c9bf07757352eafd62835e28ca6.mp3",
+      "cover": "https://wcscdn.ru/public/audio/59fe53c770dd9c9bf07757352eafd62835e28ca6.jpg"
+    },
+    {
+      "id": "6145b05387cbf9ce67b0e8b03a473a58d288f274",
+      "title": "Stop Runnin'",
+      "artist": "LIZ LOKRE",
+      "album": "Stop Runnin'",
+      "tempo": 70,
+      "duration": 207,
+      "audio": "https://wcscdn.ru/public/audio/6145b05387cbf9ce67b0e8b03a473a58d288f274.mp3",
+      "cover": "https://wcscdn.ru/public/audio/6145b05387cbf9ce67b0e8b03a473a58d288f274.jpg"
+    },
+    {
+      "id": "ed66165fd8c7535b019be72f19f6482354c6a206",
+      "title": "Pink Pony Club",
+      "artist": "Chappell Roan",
+      "album": "The Rise and Fall of a Midwest Princess",
+      "tempo": 106,
+      "duration": 258,
+      "audio": "https://wcscdn.ru/public/audio/ed66165fd8c7535b019be72f19f6482354c6a206.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ed66165fd8c7535b019be72f19f6482354c6a206.jpg"
+    },
+    {
+      "id": "c9ce10654b126b66080b4d8a1c11dfb34d1cb892",
+      "title": "Shelter",
+      "artist": "Porter Robinson & Madeon",
+      "album": "Shelter",
+      "tempo": 100,
+      "duration": 219,
+      "audio": "https://wcscdn.ru/public/audio/c9ce10654b126b66080b4d8a1c11dfb34d1cb892.mp3",
+      "cover": "https://wcscdn.ru/public/audio/c9ce10654b126b66080b4d8a1c11dfb34d1cb892.jpg"
+    },
+    {
+      "id": "af360111f27884997ba0ce86551a03cf883214d6",
+      "title": "The Joker And The Queen (feat. Taylor Swift)",
+      "artist": "Ed Sheeran & Taylor Swift",
+      "album": "The Joker And The Queen (feat. Taylor Swift)",
+      "tempo": 67,
+      "duration": 185,
+      "audio": "https://wcscdn.ru/public/audio/af360111f27884997ba0ce86551a03cf883214d6.mp3",
+      "cover": "https://wcscdn.ru/public/audio/af360111f27884997ba0ce86551a03cf883214d6.jpg"
+    },
+    {
+      "id": "ceb6592581db90c1fdde45aea23b17237adfa30c",
+      "title": "Fly Me To The Moon",
+      "artist": "Ben L'Oncle Soul",
+      "album": "Fly Me To The Moon",
+      "tempo": 91,
+      "duration": 230,
+      "audio": "https://wcscdn.ru/public/audio/ceb6592581db90c1fdde45aea23b17237adfa30c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ceb6592581db90c1fdde45aea23b17237adfa30c.jpg"
+    },
+    {
+      "id": "6ff436cd03f9bdad87265197cf6a415b1e3bc8a5",
+      "title": "Homesick",
+      "artist": "Dua Lipa",
+      "album": "Dua Lipa (Complete Edition)",
+      "tempo": 65,
+      "duration": 230,
+      "audio": "https://wcscdn.ru/public/audio/6ff436cd03f9bdad87265197cf6a415b1e3bc8a5.mp3",
+      "cover": "https://wcscdn.ru/public/audio/6ff436cd03f9bdad87265197cf6a415b1e3bc8a5.jpg"
+    },
+    {
+      "id": "146ebed66e2e3d8e7aaf4a4f0a959c9daaa9332b",
+      "title": "Obsessed",
+      "artist": "Maggie Lindemann",
+      "album": "Obsessed",
+      "tempo": 110,
+      "duration": 184,
+      "audio": "https://wcscdn.ru/public/audio/146ebed66e2e3d8e7aaf4a4f0a959c9daaa9332b.mp3",
+      "cover": "https://wcscdn.ru/public/audio/146ebed66e2e3d8e7aaf4a4f0a959c9daaa9332b.jpg"
+    },
+    {
+      "id": "0ea8bc58b07c9f6ce2ab0dc1f6fed636cd9ec8d6",
+      "title": "Pretty Girl - Cheat Codes X CADE Remix",
+      "artist": "Maggie Lindemann, CADE & Cheat Codes",
+      "album": "Pretty Girl (Cheat Codes X CADE Remix)",
+      "tempo": 121,
+      "duration": 193,
+      "audio": "https://wcscdn.ru/public/audio/0ea8bc58b07c9f6ce2ab0dc1f6fed636cd9ec8d6.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0ea8bc58b07c9f6ce2ab0dc1f6fed636cd9ec8d6.jpg"
+    },
+    {
+      "id": "fa365c68874f108e27aad73cc316b18e9b1e096f",
+      "title": "Fill Me In - AFTR:HRS Mixcut",
+      "artist": "Loud Luxury & Ryan Shepherd",
+      "album": "AFTR:HRS - Mixed By Ti\u00ebsto",
+      "tempo": 122,
+      "duration": 281,
+      "audio": "https://wcscdn.ru/public/audio/fa365c68874f108e27aad73cc316b18e9b1e096f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/fa365c68874f108e27aad73cc316b18e9b1e096f.jpg"
+    },
+    {
+      "id": "5ff0634a64d89d6d030cbf31de1f0b6f9e018f90",
+      "title": "Perm",
+      "artist": "Bruno Mars",
+      "album": "24K Magic",
+      "tempo": 123,
+      "duration": 210,
+      "audio": "https://wcscdn.ru/public/audio/5ff0634a64d89d6d030cbf31de1f0b6f9e018f90.mp3",
+      "cover": "https://wcscdn.ru/public/audio/5ff0634a64d89d6d030cbf31de1f0b6f9e018f90.jpg"
+    },
+    {
+      "id": "ab7d387a4132fb861659b81046aed4df9cd37764",
+      "title": "Chunky",
+      "artist": "Bruno Mars",
+      "album": "24K Magic",
+      "tempo": 101,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/ab7d387a4132fb861659b81046aed4df9cd37764.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ab7d387a4132fb861659b81046aed4df9cd37764.jpg"
+    },
+    {
+      "id": "979942dee79d40442120b07362b6963c30fc7ba6",
+      "title": "24K Magic",
+      "artist": "Bruno Mars",
+      "album": "24K Magic",
+      "tempo": 107,
+      "duration": 226,
+      "audio": "https://wcscdn.ru/public/audio/979942dee79d40442120b07362b6963c30fc7ba6.mp3",
+      "cover": "https://wcscdn.ru/public/audio/979942dee79d40442120b07362b6963c30fc7ba6.jpg"
+    },
+    {
+      "id": "2577ae0e70138af73ff7457a05b54526ce8e419d",
+      "title": "Locked out of Heaven",
+      "artist": "Bruno Mars",
+      "album": "Unorthodox Jukebox",
+      "tempo": 143,
+      "duration": 233,
+      "audio": "https://wcscdn.ru/public/audio/2577ae0e70138af73ff7457a05b54526ce8e419d.mp3",
+      "cover": "https://wcscdn.ru/public/audio/2577ae0e70138af73ff7457a05b54526ce8e419d.jpg"
+    },
+    {
+      "id": "214b5c3bc9a57438c118454907b478b928534c93",
+      "title": "Constellation",
+      "artist": "Win and Woo",
+      "album": "Constellation",
+      "tempo": 96,
+      "duration": 215,
+      "audio": "https://wcscdn.ru/public/audio/214b5c3bc9a57438c118454907b478b928534c93.mp3",
+      "cover": "https://wcscdn.ru/public/audio/214b5c3bc9a57438c118454907b478b928534c93.jpg"
+    },
+    {
+      "id": "e3a93b93a84fc6d01c45085261d120e92c8c0e24",
+      "title": "Hand in My Pocket",
+      "artist": "Alanis Morissette",
+      "album": "Jagged Little Pill",
+      "tempo": 92,
+      "duration": 222,
+      "audio": "https://wcscdn.ru/public/audio/e3a93b93a84fc6d01c45085261d120e92c8c0e24.mp3",
+      "cover": "https://wcscdn.ru/public/audio/e3a93b93a84fc6d01c45085261d120e92c8c0e24.jpg"
+    },
+    {
+      "id": "f8cb216bb05344f4b52d937d96387d61b6bbfe49",
+      "title": "Raye",
+      "artist": "John Splithoff",
+      "album": "Raye",
+      "tempo": 72,
+      "duration": 269,
+      "audio": "https://wcscdn.ru/public/audio/f8cb216bb05344f4b52d937d96387d61b6bbfe49.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f8cb216bb05344f4b52d937d96387d61b6bbfe49.jpg"
+    },
+    {
+      "id": "535095a800821ae936e87b25ce61ae41a9115429",
+      "title": "Sing to You",
+      "artist": "John Splithoff",
+      "album": "Sing to You",
+      "tempo": 75,
+      "duration": 207,
+      "audio": "https://wcscdn.ru/public/audio/535095a800821ae936e87b25ce61ae41a9115429.mp3",
+      "cover": "https://wcscdn.ru/public/audio/535095a800821ae936e87b25ce61ae41a9115429.jpg"
+    },
+    {
+      "id": "0af9ceefd88cdfd21ef112be909f2cbee709ec21",
+      "title": "Vices",
+      "artist": "John Splithoff",
+      "album": "Make It Happen (Deluxe Edition)",
+      "tempo": 100,
+      "duration": 196,
+      "audio": "https://wcscdn.ru/public/audio/0af9ceefd88cdfd21ef112be909f2cbee709ec21.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0af9ceefd88cdfd21ef112be909f2cbee709ec21.jpg"
+    },
+    {
+      "id": "c0a6a9e329636c6511cf39de857dad336ec0f5b9",
+      "title": "Intrigued",
+      "artist": "Nico & Vinz",
+      "album": "Intrigued",
+      "tempo": 83,
+      "duration": 197,
+      "audio": "https://wcscdn.ru/public/audio/c0a6a9e329636c6511cf39de857dad336ec0f5b9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/c0a6a9e329636c6511cf39de857dad336ec0f5b9.jpg"
+    },
+    {
+      "id": "970901780dcf9939477f9d7cd44cc0be6c62cb73",
+      "title": "Toxic",
+      "artist": "Cheesa",
+      "album": "Naked",
+      "tempo": 119,
+      "duration": 241,
+      "audio": "https://wcscdn.ru/public/audio/970901780dcf9939477f9d7cd44cc0be6c62cb73.mp3",
+      "cover": "https://wcscdn.ru/public/audio/970901780dcf9939477f9d7cd44cc0be6c62cb73.jpg"
+    },
+    {
+      "id": "145540db52680a953e580ddb8883ebbf8af40be9",
+      "title": "Half / Insane",
+      "artist": "Ryan Sallis",
+      "album": "Half / Insane",
+      "tempo": 90,
+      "duration": 241,
+      "audio": "https://wcscdn.ru/public/audio/145540db52680a953e580ddb8883ebbf8af40be9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/145540db52680a953e580ddb8883ebbf8af40be9.jpg"
+    },
+    {
+      "id": "b5a46bd7af66703eafd629190f0d0c84a05fd0e4",
+      "title": "Blue (Da Ba Dee) - Acoustic",
+      "artist": "We Rabbitz & Adam Christopher",
+      "album": "Blue (Da Ba Dee)",
+      "tempo": 119,
+      "duration": 156,
+      "audio": "https://wcscdn.ru/public/audio/b5a46bd7af66703eafd629190f0d0c84a05fd0e4.mp3",
+      "cover": "https://wcscdn.ru/public/audio/b5a46bd7af66703eafd629190f0d0c84a05fd0e4.jpg"
+    },
+    {
+      "id": "19b367e583476e3c8be72de502929f79f351148f",
+      "title": "Back At The Crossroads",
+      "artist": "Brother Yusef",
+      "album": "Back At The Crossroads Project",
+      "tempo": 146,
+      "duration": 225,
+      "audio": "https://wcscdn.ru/public/audio/19b367e583476e3c8be72de502929f79f351148f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/19b367e583476e3c8be72de502929f79f351148f.jpg"
+    },
+    {
+      "id": "d06e25959279b5bf77e215af57d3c1d8666a5ac4",
+      "title": "Between the Lines",
+      "artist": "Sara Bareilles",
+      "album": "Little Voice",
+      "tempo": 65,
+      "duration": 274,
+      "audio": "https://wcscdn.ru/public/audio/d06e25959279b5bf77e215af57d3c1d8666a5ac4.mp3",
+      "cover": "https://wcscdn.ru/public/audio/d06e25959279b5bf77e215af57d3c1d8666a5ac4.jpg"
+    },
+    {
+      "id": "3e4139f236e3644500c0dc6b3c639546cf90d452",
+      "title": "Gravity",
+      "artist": "Sara Bareilles",
+      "album": "Little Voice",
+      "tempo": 84,
+      "duration": 232,
+      "audio": "https://wcscdn.ru/public/audio/3e4139f236e3644500c0dc6b3c639546cf90d452.mp3",
+      "cover": "https://wcscdn.ru/public/audio/3e4139f236e3644500c0dc6b3c639546cf90d452.jpg"
+    },
+    {
+      "id": "f11bf6c4a6d92faac16c2772cd3cd1843932a88b",
+      "title": "Romantic - NOTD Remix",
+      "artist": "Stanaj & NOTD",
+      "album": "Romantic (NOTD Remix)",
+      "tempo": 104,
+      "duration": 184,
+      "audio": "https://wcscdn.ru/public/audio/f11bf6c4a6d92faac16c2772cd3cd1843932a88b.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f11bf6c4a6d92faac16c2772cd3cd1843932a88b.jpg"
+    },
+    {
+      "id": "55d09d88b29f57b58114c30db13e8ebf8f8c9c7a",
+      "title": "Shots - Broiler Remix",
+      "artist": "Imagine Dragons & Broiler",
+      "album": "Smoke + Mirrors (Deluxe)",
+      "tempo": 119,
+      "duration": 191,
+      "audio": "https://wcscdn.ru/public/audio/55d09d88b29f57b58114c30db13e8ebf8f8c9c7a.mp3",
+      "cover": "https://wcscdn.ru/public/audio/55d09d88b29f57b58114c30db13e8ebf8f8c9c7a.jpg"
+    },
+    {
+      "id": "7360c49fdcfefa6dc21d84b7576f731907f4093c",
+      "title": "Thunder",
+      "artist": "Imagine Dragons",
+      "album": "Evolve",
+      "tempo": 83,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/7360c49fdcfefa6dc21d84b7576f731907f4093c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/7360c49fdcfefa6dc21d84b7576f731907f4093c.jpg"
+    },
+    {
+      "id": "ac0462b046a467f708f80247561fb3580b18b4ea",
+      "title": "Whatever It Takes",
+      "artist": "Imagine Dragons",
+      "album": "Evolve",
+      "tempo": 135,
+      "duration": 201,
+      "audio": "https://wcscdn.ru/public/audio/ac0462b046a467f708f80247561fb3580b18b4ea.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ac0462b046a467f708f80247561fb3580b18b4ea.jpg"
+    },
+    {
+      "id": "ad4893149a6d75bd3f9d18bbe4a49a482b8bb1ba",
+      "title": "Cave Me In - Raiden Remix",
+      "artist": "Gallant, Tablo, Eric Nam & Raiden",
+      "album": "Cave Me In (Raiden Remix)",
+      "tempo": 100,
+      "duration": 221,
+      "audio": "https://wcscdn.ru/public/audio/ad4893149a6d75bd3f9d18bbe4a49a482b8bb1ba.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ad4893149a6d75bd3f9d18bbe4a49a482b8bb1ba.jpg"
+    },
+    {
+      "id": "f322a3955229c5193f5efe685ce7592603b01f09",
+      "title": "Take Me Where Your Heart Is",
+      "artist": "Q",
+      "album": "The Shave Experiment (Director's Cut)",
+      "tempo": 90,
+      "duration": 192,
+      "audio": "https://wcscdn.ru/public/audio/f322a3955229c5193f5efe685ce7592603b01f09.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f322a3955229c5193f5efe685ce7592603b01f09.jpg"
+    },
+    {
+      "id": "bc5a13b4810f5238faefe16f296218f433394a92",
+      "title": "All Eyez (feat. Jeremih)",
+      "artist": "The Game & Jeremih",
+      "album": "All Eyez (feat. Jeremih)",
+      "tempo": 101,
+      "duration": 215,
+      "audio": "https://wcscdn.ru/public/audio/bc5a13b4810f5238faefe16f296218f433394a92.mp3",
+      "cover": "https://wcscdn.ru/public/audio/bc5a13b4810f5238faefe16f296218f433394a92.jpg"
+    },
+    {
+      "id": "7cb0821abeadd21a1a90b8d374ff4b66f95bf36a",
+      "title": "Real Deal",
+      "artist": "Jessie J",
+      "album": "Real Deal",
+      "tempo": 85,
+      "duration": 255,
+      "audio": "https://wcscdn.ru/public/audio/7cb0821abeadd21a1a90b8d374ff4b66f95bf36a.mp3",
+      "cover": "https://wcscdn.ru/public/audio/7cb0821abeadd21a1a90b8d374ff4b66f95bf36a.jpg"
+    },
+    {
+      "id": "82193e3a59527e28cf70a8f6ac9db7fbd598ce24",
+      "title": "I Like Dat",
+      "artist": "T-Pain & Kehlani",
+      "album": "I Like Dat",
+      "tempo": 88,
+      "duration": 242,
+      "audio": "https://wcscdn.ru/public/audio/82193e3a59527e28cf70a8f6ac9db7fbd598ce24.mp3",
+      "cover": "https://wcscdn.ru/public/audio/82193e3a59527e28cf70a8f6ac9db7fbd598ce24.jpg"
+    },
+    {
+      "id": "444a70c125302058f706a370bf5448864ac95558",
+      "title": "How to Love (feat. Sofia Reyes)",
+      "artist": "Cash Cash & Sof\u00eda Reyes",
+      "album": "Blood, Sweat & 3 Years",
+      "tempo": 119,
+      "duration": 219,
+      "audio": "https://wcscdn.ru/public/audio/444a70c125302058f706a370bf5448864ac95558.mp3",
+      "cover": "https://wcscdn.ru/public/audio/444a70c125302058f706a370bf5448864ac95558.jpg"
+    },
+    {
+      "id": "c8e80c880e7adbe329372440bb36d7fb85c6ac03",
+      "title": "There for You",
+      "artist": "Martin Garrix & Troye Sivan",
+      "album": "There for You",
+      "tempo": 106,
+      "duration": 221,
+      "audio": "https://wcscdn.ru/public/audio/c8e80c880e7adbe329372440bb36d7fb85c6ac03.mp3",
+      "cover": "https://wcscdn.ru/public/audio/c8e80c880e7adbe329372440bb36d7fb85c6ac03.jpg"
+    },
+    {
+      "id": "d6249ddc814b32e4c54c859c31db30ce9751a697",
+      "title": "Don't Wanna Know",
+      "artist": "Maroon 5 & Kendrick Lamar",
+      "album": "Don't Wanna Know",
+      "tempo": 100,
+      "duration": 214,
+      "audio": "https://wcscdn.ru/public/audio/d6249ddc814b32e4c54c859c31db30ce9751a697.mp3",
+      "cover": "https://wcscdn.ru/public/audio/d6249ddc814b32e4c54c859c31db30ce9751a697.jpg"
+    },
+    {
+      "id": "7bd5b0fc8156099060639cd5a5028fd2e775aeb9",
+      "title": "Lips On You",
+      "artist": "Maroon 5",
+      "album": "Red Pill Blues (Deluxe)",
+      "tempo": 103,
+      "duration": 216,
+      "audio": "https://wcscdn.ru/public/audio/7bd5b0fc8156099060639cd5a5028fd2e775aeb9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/7bd5b0fc8156099060639cd5a5028fd2e775aeb9.jpg"
+    },
+    {
+      "id": "a42ca58dbe54dc1e367ca47b3b3fc444febc746b",
+      "title": "What Lovers Do (feat. SZA)",
+      "artist": "Maroon 5 & SZA",
+      "album": "What Lovers Do (feat. SZA)",
+      "tempo": 110,
+      "duration": 199,
+      "audio": "https://wcscdn.ru/public/audio/a42ca58dbe54dc1e367ca47b3b3fc444febc746b.mp3",
+      "cover": "https://wcscdn.ru/public/audio/a42ca58dbe54dc1e367ca47b3b3fc444febc746b.jpg"
+    },
+    {
+      "id": "10f12acdac991dd7cd78e33d008f9695d3c44e74",
+      "title": "Maps",
+      "artist": "Maroon 5",
+      "album": "V",
+      "tempo": 120,
+      "duration": 190,
+      "audio": "https://wcscdn.ru/public/audio/10f12acdac991dd7cd78e33d008f9695d3c44e74.mp3",
+      "cover": "https://wcscdn.ru/public/audio/10f12acdac991dd7cd78e33d008f9695d3c44e74.jpg"
+    },
+    {
+      "id": "96d499dbfa52e35bd372fd9ce675b40c384323cd",
+      "title": "Don't Let Me Drown",
+      "artist": "Tabitha Nauser",
+      "album": "Don't Let Me Drown",
+      "tempo": 119,
+      "duration": 185,
+      "audio": "https://wcscdn.ru/public/audio/96d499dbfa52e35bd372fd9ce675b40c384323cd.mp3",
+      "cover": "https://wcscdn.ru/public/audio/96d499dbfa52e35bd372fd9ce675b40c384323cd.jpg"
+    },
+    {
+      "id": "7b6375c6c1d007f462411887392d46535bf97a25",
+      "title": "Slow Motion",
+      "artist": "Charlotte Lawrence",
+      "album": "Slow Motion",
+      "tempo": 64,
+      "duration": 183,
+      "audio": "https://wcscdn.ru/public/audio/7b6375c6c1d007f462411887392d46535bf97a25.mp3",
+      "cover": "https://wcscdn.ru/public/audio/7b6375c6c1d007f462411887392d46535bf97a25.jpg"
+    },
+    {
+      "id": "7c0e1bfd2e3369f7d5a154718d6749525f09ea3f",
+      "title": "Feel It Still",
+      "artist": "Sofia Carson",
+      "album": "Purple Hearts (Original Soundtrack)",
+      "tempo": 75,
+      "duration": 144,
+      "audio": "https://wcscdn.ru/public/audio/7c0e1bfd2e3369f7d5a154718d6749525f09ea3f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/7c0e1bfd2e3369f7d5a154718d6749525f09ea3f.jpg"
+    },
+    {
+      "id": "ff4493be8d0153e94085a5a554b2111250df3f8f",
+      "title": "Come Back Home",
+      "artist": "Sofia Carson",
+      "album": "Purple Hearts (Original Soundtrack)",
+      "tempo": 72,
+      "duration": 176,
+      "audio": "https://wcscdn.ru/public/audio/ff4493be8d0153e94085a5a554b2111250df3f8f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ff4493be8d0153e94085a5a554b2111250df3f8f.jpg"
+    },
+    {
+      "id": "db00deace311d55fa1b7634e1e5f3e61b4fa34da",
+      "title": "Stop",
+      "artist": "Sam Brown & Pete Brown",
+      "album": "Stop!",
+      "tempo": 62,
+      "duration": 295,
+      "audio": "https://wcscdn.ru/public/audio/db00deace311d55fa1b7634e1e5f3e61b4fa34da.mp3",
+      "cover": "https://wcscdn.ru/public/audio/db00deace311d55fa1b7634e1e5f3e61b4fa34da.jpg"
+    },
+    {
+      "id": "d89d7c656c57ce1d45b21dccfc5b6d6c74572fe1",
+      "title": "Sandcastles",
+      "artist": "Adam Jensen",
+      "album": "Sandcastles",
+      "tempo": 119,
+      "duration": 226,
+      "audio": "https://wcscdn.ru/public/audio/d89d7c656c57ce1d45b21dccfc5b6d6c74572fe1.mp3",
+      "cover": "https://wcscdn.ru/public/audio/d89d7c656c57ce1d45b21dccfc5b6d6c74572fe1.jpg"
+    },
+    {
+      "id": "e007cf3cecac05cb06ae565b49ba1ca2018e02f9",
+      "title": "Make It On Me (feat. Airliftz) (feat. Airliftz)",
+      "artist": "NYK & Airliftz",
+      "album": "Make It On Me (feat. Airliftz) (feat. Airliftz)",
+      "tempo": 72,
+      "duration": 169,
+      "audio": "https://wcscdn.ru/public/audio/e007cf3cecac05cb06ae565b49ba1ca2018e02f9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/e007cf3cecac05cb06ae565b49ba1ca2018e02f9.jpg"
+    },
+    {
+      "id": "9eff4b5ed4b1af42cc4f5dc3bdc665a18b4e3855",
+      "title": "HandClap",
+      "artist": "Fitz and The Tantrums",
+      "album": "Fitz and The Tantrums",
+      "tempo": 139,
+      "duration": 193,
+      "audio": "https://wcscdn.ru/public/audio/9eff4b5ed4b1af42cc4f5dc3bdc665a18b4e3855.mp3",
+      "cover": "https://wcscdn.ru/public/audio/9eff4b5ed4b1af42cc4f5dc3bdc665a18b4e3855.jpg"
+    },
+    {
+      "id": "be13a0fe44f7b3961929dff22f5840d44403172d",
+      "title": "Make Me Feel",
+      "artist": "Janelle Mon\u00e1e",
+      "album": "Dirty Computer",
+      "tempo": 114,
+      "duration": 194,
+      "audio": "https://wcscdn.ru/public/audio/be13a0fe44f7b3961929dff22f5840d44403172d.mp3",
+      "cover": "https://wcscdn.ru/public/audio/be13a0fe44f7b3961929dff22f5840d44403172d.jpg"
+    },
+    {
+      "id": "1116acb839855106ecf8501447d7206c1793f19a",
+      "title": "Stay With Me (feat. Jeremy Zucker)",
+      "artist": "ayokay & Jeremy Zucker",
+      "album": "In the Shape of a Dream",
+      "tempo": 100,
+      "duration": 189,
+      "audio": "https://wcscdn.ru/public/audio/1116acb839855106ecf8501447d7206c1793f19a.mp3",
+      "cover": "https://wcscdn.ru/public/audio/1116acb839855106ecf8501447d7206c1793f19a.jpg"
+    },
+    {
+      "id": "ab7b96f437fb6a9ac4d1fd531c43770b576b2261",
+      "title": "Warm Water - Snakehips Remix",
+      "artist": "BANKS & Snakehips",
+      "album": "Warm Water (Snakehips Remix)",
+      "tempo": 106,
+      "duration": 253,
+      "audio": "https://wcscdn.ru/public/audio/ab7b96f437fb6a9ac4d1fd531c43770b576b2261.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ab7b96f437fb6a9ac4d1fd531c43770b576b2261.jpg"
+    },
+    {
+      "id": "0cca29b4474bc5eb337301c81ddbcbe8b9080bb9",
+      "title": "r u ok",
+      "artist": "Tate McRae",
+      "album": "r u ok",
+      "tempo": 69,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/0cca29b4474bc5eb337301c81ddbcbe8b9080bb9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0cca29b4474bc5eb337301c81ddbcbe8b9080bb9.jpg"
+    },
+    {
+      "id": "957baf76f8ba1dad5f6c5c882f16b8e4df4fbfe8",
+      "title": "Hometown Girl",
+      "artist": "ZHU",
+      "album": "GENERATIONWHY",
+      "tempo": 100,
+      "duration": 252,
+      "audio": "https://wcscdn.ru/public/audio/957baf76f8ba1dad5f6c5c882f16b8e4df4fbfe8.mp3",
+      "cover": "https://wcscdn.ru/public/audio/957baf76f8ba1dad5f6c5c882f16b8e4df4fbfe8.jpg"
+    },
+    {
+      "id": "d2b9d6ca0703cf8e8f37127c62413a9e0d4a6074",
+      "title": "Unbreakable",
+      "artist": "Kimberly Anne",
+      "album": "Ballads",
+      "tempo": 63,
+      "duration": 205,
+      "audio": "https://wcscdn.ru/public/audio/d2b9d6ca0703cf8e8f37127c62413a9e0d4a6074.mp3",
+      "cover": "https://wcscdn.ru/public/audio/d2b9d6ca0703cf8e8f37127c62413a9e0d4a6074.jpg"
+    },
+    {
+      "id": "8fad8036c738bf386d6ee1cd7791f31290659be4",
+      "title": "Don't Tempt Me",
+      "artist": "MiC LOWRY",
+      "album": "Don't Tempt Me",
+      "tempo": 91,
+      "duration": 217,
+      "audio": "https://wcscdn.ru/public/audio/8fad8036c738bf386d6ee1cd7791f31290659be4.mp3",
+      "cover": "https://wcscdn.ru/public/audio/8fad8036c738bf386d6ee1cd7791f31290659be4.jpg"
+    },
+    {
+      "id": "6ab911916aea3afd2b26278b92dd5a10e4ad0216",
+      "title": "Oh Lord",
+      "artist": "MiC LOWRY",
+      "album": "Oh Lord",
+      "tempo": 96,
+      "duration": 214,
+      "audio": "https://wcscdn.ru/public/audio/6ab911916aea3afd2b26278b92dd5a10e4ad0216.mp3",
+      "cover": "https://wcscdn.ru/public/audio/6ab911916aea3afd2b26278b92dd5a10e4ad0216.jpg"
+    },
+    {
+      "id": "816f43cba559436dbdd1a58739b9ab6f0bcf6530",
+      "title": "Middle",
+      "artist": "DJ Snake & Bipolar Sunshine",
+      "album": "Middle",
+      "tempo": 105,
+      "duration": 220,
+      "audio": "https://wcscdn.ru/public/audio/816f43cba559436dbdd1a58739b9ab6f0bcf6530.mp3",
+      "cover": "https://wcscdn.ru/public/audio/816f43cba559436dbdd1a58739b9ab6f0bcf6530.jpg"
+    },
+    {
+      "id": "95bc1b6f86dedd1e78dad944788ddc04c226772e",
+      "title": "Get My Name",
+      "artist": "Mark Ballas",
+      "album": "Get My Name",
+      "tempo": 121,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/95bc1b6f86dedd1e78dad944788ddc04c226772e.mp3",
+      "cover": "https://wcscdn.ru/public/audio/95bc1b6f86dedd1e78dad944788ddc04c226772e.jpg"
+    },
+    {
+      "id": "883811b38348e4ae7c7b6de3dca01c7aeb48f5f9",
+      "title": "So Sick - Acoustic",
+      "artist": "Ne-Yo",
+      "album": "So Sick",
+      "tempo": 90,
+      "duration": 183,
+      "audio": "https://wcscdn.ru/public/audio/883811b38348e4ae7c7b6de3dca01c7aeb48f5f9.mp3",
+      "cover": "https://wcscdn.ru/public/audio/883811b38348e4ae7c7b6de3dca01c7aeb48f5f9.jpg"
+    },
+    {
+      "id": "e5e1c3fdb68d0481ffd473ae7e4e3dfe224b0ee1",
+      "title": "Nobody",
+      "artist": "Ne-Yo",
+      "album": "Year Of The Gentleman (Bonus Track Edition)",
+      "tempo": 114,
+      "duration": 187,
+      "audio": "https://wcscdn.ru/public/audio/e5e1c3fdb68d0481ffd473ae7e4e3dfe224b0ee1.mp3",
+      "cover": "https://wcscdn.ru/public/audio/e5e1c3fdb68d0481ffd473ae7e4e3dfe224b0ee1.jpg"
+    },
+    {
+      "id": "e97aea95d2cc0bf1b1bf636ea92912c7eb0c63b3",
+      "title": "Surrender",
+      "artist": "Daniel Johns",
+      "album": "Aerial Love EP",
+      "tempo": 94,
+      "duration": 256,
+      "audio": "https://wcscdn.ru/public/audio/e97aea95d2cc0bf1b1bf636ea92912c7eb0c63b3.mp3",
+      "cover": "https://wcscdn.ru/public/audio/e97aea95d2cc0bf1b1bf636ea92912c7eb0c63b3.jpg"
+    },
+    {
+      "id": "f0a75c6eedeed2ad25e4148a5ff5464357e0a9fe",
+      "title": "i'm so tired...",
+      "artist": "Lauv & Troye Sivan",
+      "album": "i'm so tired...",
+      "tempo": 103,
+      "duration": 162,
+      "audio": "https://wcscdn.ru/public/audio/f0a75c6eedeed2ad25e4148a5ff5464357e0a9fe.mp3",
+      "cover": "https://wcscdn.ru/public/audio/f0a75c6eedeed2ad25e4148a5ff5464357e0a9fe.jpg"
+    },
+    {
+      "id": "4b4a2d2b3b67a770247f9725a5582d07110d3e6f",
+      "title": "Freak Caroline - Almand and SAMME Remix",
+      "artist": "Sterling Fox, Almand & SAMME",
+      "album": "Freak Caroline (Freak Remixes)",
+      "tempo": 98,
+      "duration": 256,
+      "audio": "https://wcscdn.ru/public/audio/4b4a2d2b3b67a770247f9725a5582d07110d3e6f.mp3",
+      "cover": "https://wcscdn.ru/public/audio/4b4a2d2b3b67a770247f9725a5582d07110d3e6f.jpg"
+    },
+    {
+      "id": "aad6b912e52dc8b2dbf92f4fcdc68fcc01fd932c",
+      "title": "You & Me",
+      "artist": "Marc E. Bassy & G-Eazy",
+      "album": "Groovy People",
+      "tempo": 84,
+      "duration": 218,
+      "audio": "https://wcscdn.ru/public/audio/aad6b912e52dc8b2dbf92f4fcdc68fcc01fd932c.mp3",
+      "cover": "https://wcscdn.ru/public/audio/aad6b912e52dc8b2dbf92f4fcdc68fcc01fd932c.jpg"
+    },
+    {
+      "id": "ba1381f1b73d30ffcb00b176ef99ba11c9b88676",
+      "title": "Morning",
+      "artist": "Marc E. Bassy",
+      "album": "Groovy People",
+      "tempo": 75,
+      "duration": 206,
+      "audio": "https://wcscdn.ru/public/audio/ba1381f1b73d30ffcb00b176ef99ba11c9b88676.mp3",
+      "cover": "https://wcscdn.ru/public/audio/ba1381f1b73d30ffcb00b176ef99ba11c9b88676.jpg"
+    },
+    {
+      "id": "6e1b3957e165713c35cf38214860524b42996ebc",
+      "title": "Plot Twist",
+      "artist": "Marc E. Bassy & KYLE",
+      "album": "Gossip Columns",
+      "tempo": 96,
+      "duration": 227,
+      "audio": "https://wcscdn.ru/public/audio/6e1b3957e165713c35cf38214860524b42996ebc.mp3",
+      "cover": "https://wcscdn.ru/public/audio/6e1b3957e165713c35cf38214860524b42996ebc.jpg"
+    },
+    {
+      "id": "0fec043421d5ccfe11b90f1aef56a18a9acd4705",
+      "title": "Woman Like Me (feat. Nicki Minaj)",
+      "artist": "Little Mix & Nicki Minaj",
+      "album": "Woman Like Me (feat. Nicki Minaj)",
+      "tempo": 74,
+      "duration": 228,
+      "audio": "https://wcscdn.ru/public/audio/0fec043421d5ccfe11b90f1aef56a18a9acd4705.mp3",
+      "cover": "https://wcscdn.ru/public/audio/0fec043421d5ccfe11b90f1aef56a18a9acd4705.jpg"
+    },
+    {
+      "id": "d93fe1727e467b0505ba1fc8b36c583566d839a8",
+      "title": "Touch",
+      "artist": "Matt DiMona",
+      "album": "Up All Night - EP",
+      "tempo": 90,
+      "duration": 216,
+      "audio": "https://wcscdn.ru/public/audio/d93fe1727e467b0505ba1fc8b36c583566d839a8.mp3",
+      "cover": "https://wcscdn.ru/public/audio/d93fe1727e467b0505ba1fc8b36c583566d839a8.jpg"
+    }
+  ],
+  "minTempo": 62,
+  "maxTempo": 157
+}

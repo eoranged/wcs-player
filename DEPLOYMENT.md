@@ -56,20 +56,16 @@ Configure the following environment variables in `.env.production.local`:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `TG_ADMIN` | Telegram user ID for admin access | `123456789` |
-| `NEXT_PUBLIC_STYLES_BASE_URL` | Base URL for styles (optional) | `https://cdn.example.com/styles` |
-| `NEXT_PUBLIC_PLAYLISTS_BASE_URL` | Base URL for playlists (optional) | `https://api.example.com/playlists` |
-| `NEXT_PUBLIC_AUDIO_BASE_URL` | Base URL for audio files (optional) | `https://audio-cdn.example.com` |
+| `NEXT_PUBLIC_BASE_URL` | Base URL for all resources (required) | `https://cdn.example.com/music-app` |
 | `SENTRY_DSN` | Sentry DSN for error tracking (optional) | `https://...@sentry.io/...` |
 
 ### Volume Mounts
 
 The Docker Compose configuration includes volume mounts for:
 
-- **Playlists**: `./public/playlists:/app/public/playlists:ro`
-- **Styles**: `./public/styles:/app/public/styles:ro`
 - **Logs**: `./logs:/app/logs`
 
-This allows you to update playlists and styles without rebuilding the container.
+**Note**: Playlists and styles are now served from external URLs configured via `NEXT_PUBLIC_BASE_URL` and are no longer stored locally.
 
 ## Production Deployment
 
@@ -154,13 +150,16 @@ docker-compose logs --since="2024-01-01T00:00:00Z"
    docker-compose up -d
    ```
 
-### Updating Playlists
+### Updating Playlists and Styles
 
-Since playlists are mounted as volumes, you can update them without rebuilding:
+Playlists and styles are now served from external URLs. To update them:
+
+1. Update the files on your external server (configured via `NEXT_PUBLIC_BASE_URL`)
+2. The changes will be reflected immediately without any container restart
 
 ```bash
-# Update playlist files in ./public/playlists/
-# The changes will be reflected immediately
+# Example: Upload updated files to your CDN or external server
+# rsync -avz ./data/ user@your-server:/path/to/music-app/
 ```
 
 ## Troubleshooting
@@ -174,11 +173,11 @@ Since playlists are mounted as volumes, you can update them without rebuilding:
      - "3001:3000"  # Use port 3001 instead
    ```
 
-2. **Permission issues with volumes**
+2. **Base URL not configured**
    ```bash
-   # Ensure proper ownership
-   sudo chown -R $USER:$USER ./public/playlists
-   sudo chown -R $USER:$USER ./public/styles
+   # Ensure NEXT_PUBLIC_BASE_URL is set
+   echo $NEXT_PUBLIC_BASE_URL
+   # Should return your external server URL
    ```
 
 3. **Environment variables not loading**

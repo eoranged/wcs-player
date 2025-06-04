@@ -1,34 +1,27 @@
 /**
- * Get the base URL for a resource type from environment variables
- * @param {string} resourceType - The type of resource ('styles', 'playlists', 'audio')
+ * Get the base URL from environment variables
  * @returns {string} - The base URL or empty string for local files
  */
-const getBaseUrl = (resourceType) => {
-  switch (resourceType) {
-    case 'styles':
-      return process.env.NEXT_PUBLIC_STYLES_BASE_URL || '';
-    case 'playlists':
-      return process.env.NEXT_PUBLIC_PLAYLISTS_BASE_URL || '';
-    case 'audio':
-      return process.env.NEXT_PUBLIC_AUDIO_BASE_URL || '';
-    default:
-      return '';
-  }
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_BASE_URL || '';
 };
 
 /**
- * Fetches data from JSON files (local or remote based on environment variables)
+ * Fetches data from JSON files (remote based on environment variables)
  * @param {string} path - The path to the JSON file (relative)
- * @param {string} resourceType - The type of resource ('styles', 'playlists')
  * @returns {Promise<Object>} - The parsed JSON response
  * @throws {Error} - If the request fails
  */
-export const fetchJson = async (path, resourceType = '') => {
+export const fetchJson = async (path) => {
   try {
-    const baseUrl = getBaseUrl(resourceType);
-    const fullUrl = baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path;
+    const baseUrl = getBaseUrl();
+    if (!baseUrl) {
+      throw new Error('NEXT_PUBLIC_BASE_URL is required but not configured');
+    }
     
-    console.log(`Fetching JSON file: ${fullUrl} (base: ${baseUrl || 'local'})`);
+    const fullUrl = `${baseUrl.replace(/\/$/, '')}${path}`;
+    
+    console.log(`Fetching JSON file: ${fullUrl}`);
     
     const response = await fetch(fullUrl);
     
@@ -62,8 +55,8 @@ export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
   try {
     console.log(`Fetching music library for playlist: ${playlistId}`);
     
-    // Use JSON file for the playlist with playlists base URL
-    const data = await fetchJson(`/playlists/${playlistId}.json`, 'playlists');
+    // Use JSON file for the playlist from the base URL
+    const data = await fetchJson(`/playlists/${playlistId}.json`);
     
     // Validate the data structure
     if (!data || !data.songs) {
@@ -85,11 +78,11 @@ export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
     }
     
     // Process audio URLs to use base URL if configured
-    const audioBaseUrl = getBaseUrl('audio');
-    if (audioBaseUrl) {
+    const baseUrl = getBaseUrl();
+    if (baseUrl) {
       data.songs = data.songs.map(song => ({
         ...song,
-        audio: song.audio.startsWith('http') ? song.audio : `${audioBaseUrl.replace(/\/$/, '')}${song.audio}`
+        audio: song.audio.startsWith('http') ? song.audio : `${baseUrl.replace(/\/$/, '')}${song.audio}`
       }));
     }
     
@@ -135,8 +128,8 @@ export const fetchPlaylists = async (style = 'West Coast Swing') => {
     // Convert style name to filename format
     const styleFileName = style.toLowerCase().replace(/ /g, '_');
     
-    // Use JSON file for the style with styles base URL
-    const data = await fetchJson(`/styles/${styleFileName}.json`, 'styles');
+    // Use JSON file for the style from the base URL
+    const data = await fetchJson(`/styles/${styleFileName}.json`);
     
     // Validate the data structure
     if (!data || !data.playlists) {
@@ -170,9 +163,9 @@ export const processAudioUrl = (audioUrl) => {
     return audioUrl;
   }
   
-  const audioBaseUrl = getBaseUrl('audio');
-  if (audioBaseUrl) {
-    return `${audioBaseUrl.replace(/\/$/, '')}${audioUrl}`;
+  const baseUrl = getBaseUrl();
+  if (baseUrl) {
+    return `${baseUrl.replace(/\/$/, '')}${audioUrl}`;
   }
   
   return audioUrl;
