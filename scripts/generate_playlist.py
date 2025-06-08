@@ -18,7 +18,7 @@ import hashlib
 import logging
 import argparse
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, cast
 import time
 import io
 
@@ -30,7 +30,7 @@ try:
     from mutagen.mp4 import MP4Cover
     import acoustid
     import paramiko
-    from paramiko import SSHClient
+    from paramiko import SSHClient, SFTPClient
     import requests
 except ImportError as e:
     print(f"Missing required dependency: {e}")
@@ -82,17 +82,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class PlaylistGenerator:
-    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False, skip_no_tempo: bool = False):
+    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False, skip_no_tempo: bool = False, temp_dir: str = "./temp_audio"):
         """Initialize the playlist generator with configuration."""
         self.config = self._load_config(config_path)
         self.style = style
         self.playlist_name = playlist_name
         self.skip_no_tempo = skip_no_tempo
+        self.temp_dir = temp_dir
         self.processed_files = []
         self.skipped_files = []
         self.errors = []
         self.metadata_errors = []
         self.tempo_measured_files = []
+        self.ssh_client = None
+        self.sftp_client = None
+        self.remote_audio_files = None  # Cache for remote audio files list
+        
+        # Create and ensure temp directory exists
+        Path(self.temp_dir).mkdir(exist_ok=True)
         
         # Verify ffmpeg is available (skip for dummy instances)
         if not allow_dummy and not which("ffmpeg"):
@@ -140,6 +147,144 @@ class PlaylistGenerator:
                 default_config.update(user_config)
         
         return default_config
+    
+    def _get_ssh_connection(self) -> Tuple[SSHClient, object]:
+        """Get or create SSH connection and SFTP client."""
+        if self.ssh_client is None or self.sftp_client is None:
+            ssh_config = self.config["ssh"]
+            
+            self.ssh_client = SSHClient()
+            self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            
+            # Connect using key file
+            key_path = os.path.expanduser(ssh_config["key_filename"])
+            self.ssh_client.connect(
+                hostname=ssh_config["hostname"],
+                username=ssh_config["username"],
+                port=ssh_config["port"],
+                key_filename=key_path,
+            )
+            
+            self.sftp_client = self.ssh_client.open_sftp()
+        
+        return self.ssh_client, self.sftp_client
+    
+    def _close_ssh_connection(self) -> None:
+        """Close SSH connection and SFTP client."""
+        if self.sftp_client:
+            self.sftp_client.close()
+            self.sftp_client = None
+        if self.ssh_client:
+            self.ssh_client.close()
+            self.ssh_client = None
+    
+    def sync_playlists_from_server(self) -> bool:
+        """Sync playlists directory from server. Fail if this step fails."""
+        try:
+            logger.info("Syncing playlists from server...")
+            ssh, sftp = self._get_ssh_connection()
+            sftp = cast(SFTPClient, sftp)
+            ssh_config = self.config["ssh"]
+            
+            # Create local playlists directory
+            local_playlists_dir = self.config["output"]["playlists_dir"]
+            os.makedirs(local_playlists_dir, exist_ok=True)
+            
+            # Remote playlists path
+            remote_playlists_path = os.path.join(ssh_config["remote_path"], ssh_config.get("playlists_path", "public/playlists"))
+            
+            try:
+                # List files in remote playlists directory
+                remote_files = sftp.listdir(remote_playlists_path)
+                
+                for remote_file in remote_files:
+                    if remote_file.endswith('.json'):
+                        remote_file_path = os.path.join(remote_playlists_path, remote_file).replace("\\", "/")
+                        local_file_path = os.path.join(local_playlists_dir, remote_file)
+                        
+                        logger.info(f"Downloading playlist: {remote_file}")
+                        sftp.get(remote_file_path, local_file_path)
+                
+                logger.info(f"Successfully synced {len([f for f in remote_files if f.endswith('.json')])} playlists from server")
+                return True
+                
+            except FileNotFoundError:
+                logger.info("Remote playlists directory does not exist yet, starting fresh")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to sync playlists from server: {e}")
+            return False
+    
+    def sync_styles_from_server(self) -> bool:
+        """Sync styles directory from server. Fail if this step fails."""
+        try:
+            logger.info("Syncing styles from server...")
+            ssh, sftp = self._get_ssh_connection()
+            sftp = cast(SFTPClient, sftp)
+            ssh_config = self.config["ssh"]
+            
+            # Create local styles directory
+            local_styles_dir = self.config["output"]["styles_dir"]
+            os.makedirs(local_styles_dir, exist_ok=True)
+            
+            # Remote styles path
+            remote_styles_path = os.path.join(ssh_config["remote_path"], ssh_config.get("styles_path", "public/styles"))
+            
+            try:
+                # List files in remote styles directory
+                remote_files = sftp.listdir(remote_styles_path)
+                
+                for remote_file in remote_files:
+                    if remote_file.endswith('.json'):
+                        remote_file_path = os.path.join(remote_styles_path, remote_file).replace("\\", "/")
+                        local_file_path = os.path.join(local_styles_dir, remote_file)
+                        
+                        logger.info(f"Downloading style: {remote_file}")
+                        sftp.get(remote_file_path, local_file_path)
+                
+                logger.info(f"Successfully synced {len([f for f in remote_files if f.endswith('.json')])} styles from server")
+                return True
+                
+            except FileNotFoundError:
+                logger.info("Remote styles directory does not exist yet, starting fresh")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Failed to sync styles from server: {e}")
+            return False
+    
+    def fetch_remote_audio_files(self) -> List[str]:
+        """Fetch list of all files in remote audio folder."""
+        if self.remote_audio_files is not None:
+            return self.remote_audio_files
+        
+        try:
+            logger.info("Fetching list of remote audio files...")
+            ssh, sftp = self._get_ssh_connection()
+            sftp = cast(SFTPClient, sftp)
+            ssh_config = self.config["ssh"]
+            
+            # Remote audio path
+            remote_audio_path = os.path.join(ssh_config["remote_path"], ssh_config.get("audio_path", "public/audio"))
+            
+            try:
+                # List files in remote audio directory
+                remote_files = sftp.listdir(remote_audio_path)
+                # Filter for MP3 files only
+                self.remote_audio_files = [f for f in remote_files if f.endswith('.mp3')]
+                logger.info(f"Found {len(self.remote_audio_files)} audio files on remote server")
+                return self.remote_audio_files
+                
+            except FileNotFoundError:
+                logger.info("Remote audio directory does not exist yet, starting fresh")
+                self.remote_audio_files = []
+                return self.remote_audio_files
+                
+        except Exception as e:
+            logger.error(f"Failed to fetch remote audio files: {e}")
+            self.remote_audio_files = []
+            return self.remote_audio_files
     
     def convert_to_mp3(self, input_path: str, output_path: str) -> bool:
         """Convert audio file to MP3 format."""
@@ -453,24 +598,30 @@ class PlaylistGenerator:
             return None
     
     def calculate_tempo_range_from_songs(self, songs: List[Dict]) -> Tuple[int, int]:
-        """Calculate tempo range from a list of songs with optional buffer."""
+        """Calculate tempo range from minimal to maximal tempo for all songs in playlist."""
         if not songs:
-            # If no songs yet, use a very wide range that will be adjusted
-            raise ValueError("empty list")
+            raise ValueError("Cannot calculate tempo range from empty song list")
         
+        # Extract valid tempo values, filtering out None/invalid values
+        valid_tempos = []
         for song in songs:
-            if "tempo" not in song:
-                raise ValueError("song %s with no tempo" % song)
-        tempos = [song["tempo"] for song in songs]
-        if not tempos:
-            raise ValueError("no tempos")
+            tempo = song.get("tempo")
+            if tempo is not None and isinstance(tempo, (int, float)) and tempo > 0:
+                valid_tempos.append(int(tempo))
+            else:
+                logger.warning(f"Song {song.get('id', 'unknown')} has invalid tempo: {tempo}")
         
-        min_tempo = min(tempos)
-        max_tempo = max(tempos)
+        if not valid_tempos:
+            raise ValueError("No valid tempo values found in songs")
+        
+        min_tempo = min(valid_tempos)
+        max_tempo = max(valid_tempos)
+        
+        logger.debug(f"Calculated tempo range from {len(valid_tempos)} songs: {min_tempo}-{max_tempo} BPM")
         
         return min_tempo, max_tempo
     
-    def create_remote_directory(self, sftp, remote_dir_path: str) -> bool:
+    def create_remote_directory(self, sftp: SFTPClient, remote_dir_path: str) -> bool:
         """Create remote directory with proper permissions (755) if it doesn't exist."""
         try:
             # Try to stat the directory first
@@ -587,21 +738,9 @@ class PlaylistGenerator:
     def upload_file_ssh(self, local_path: str, remote_filename: str, subfolder: str = "audio") -> bool:
         """Upload file to server via SSH with automatic directory creation and proper permissions."""
         try:
+            ssh, sftp = self._get_ssh_connection()
+            sftp = cast(SFTPClient, sftp)
             ssh_config = self.config["ssh"]
-            
-            ssh = SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            
-            # Connect using key file
-            key_path = os.path.expanduser(ssh_config["key_filename"])
-            ssh.connect(
-                hostname=ssh_config["hostname"],
-                username=ssh_config["username"],
-                port=ssh_config["port"],
-                key_filename=key_path,
-            )
-            
-            sftp = ssh.open_sftp()
             
             # Determine the target directory based on subfolder
             if subfolder == "audio":
@@ -615,22 +754,27 @@ class PlaylistGenerator:
             
             # Ensure target directory exists
             if not self.create_remote_directory(sftp, target_dir):
-                sftp.close()
-                ssh.close()
                 return False
             
             remote_path = os.path.join(target_dir, remote_filename)
             
-            # Check if file already exists
-            try:
-                sftp.stat(remote_path)
-                logger.info(f"File {remote_filename} already exists on server, skipping upload")
-                sftp.close()
-                ssh.close()
-                return True
-            except FileNotFoundError:
-                # File doesn't exist, proceed with upload
-                pass
+            # Check if file already exists - only skip for audio files
+            if subfolder == "audio":
+                try:
+                    sftp.stat(remote_path)
+                    logger.info(f"Audio file {remote_filename} already exists on server, skipping upload")
+                    return True
+                except FileNotFoundError:
+                    # File doesn't exist, proceed with upload
+                    pass
+            else:
+                # For non-audio files (playlists, styles), allow overwriting
+                try:
+                    sftp.stat(remote_path)
+                    logger.info(f"File {remote_filename} exists in {subfolder}, will overwrite")
+                except FileNotFoundError:
+                    # File doesn't exist, proceed with upload
+                    pass
             
             # Add diagnostic logging
             logger.info(f"Current working directory: {os.getcwd()}")
@@ -656,8 +800,6 @@ class PlaylistGenerator:
             sftp.chmod(remote_path, 0o644)
             logger.debug(f"Set file permissions to 644 for {remote_path}")
             
-            sftp.close()
-            ssh.close()
             logger.info(f"Successfully uploaded {remote_filename} to {subfolder} subfolder")
             return True
             
@@ -737,7 +879,7 @@ class PlaylistGenerator:
             return False
     
     def update_style_file(self) -> bool:
-        """Update style file to include new playlist."""
+        """Update style file to include new playlist or update existing playlist."""
         try:
             style_file = os.path.join(self.config["output"]["styles_dir"], f"{self.style}.json")
             
@@ -752,37 +894,55 @@ class PlaylistGenerator:
                     "playlists": []
                 }
             
+            # Load playlist to get current metadata
+            playlist_file = os.path.join(self.config["output"]["playlists_dir"], f"{self.playlist_name}.json")
+            if not os.path.exists(playlist_file):
+                logger.warning(f"Playlist file {playlist_file} does not exist, cannot update style")
+                return False
+            
+            with open(playlist_file, 'r') as f:
+                playlist = json.load(f)
+            
+            # Create or update playlist entry
+            playlist_entry = {
+                "id": self.playlist_name,
+                "name": playlist["name"],
+                "minTempo": playlist["minTempo"],
+                "maxTempo": playlist["maxTempo"],
+                "description": playlist.get("description", f"Auto-generated playlist for {playlist['name']}")
+            }
+            
             # Check if playlist already exists in style
-            existing_playlist_ids = [p["id"] for p in style_data["playlists"]]
-            if self.playlist_name not in existing_playlist_ids:
-                # Load playlist to get metadata
-                playlist_file = os.path.join(self.config["output"]["playlists_dir"], f"{self.playlist_name}.json")
-                if os.path.exists(playlist_file):
-                    with open(playlist_file, 'r') as f:
-                        playlist = json.load(f)
-                    
-                    style_data["playlists"].append({
-                        "id": self.playlist_name,
-                        "name": playlist["name"],
-                        "minTempo": playlist["minTempo"],
-                        "maxTempo": playlist["maxTempo"],
-                        "description": f"Auto-generated playlist for {playlist['name']}"
-                    })
-                    
-                    # Save style file locally
-                    os.makedirs(os.path.dirname(style_file), exist_ok=True)
-                    with open(style_file, 'w') as f:
-                        json.dump(style_data, f, indent=2)
-                    
-                    # Upload style file to remote server
-                    style_filename = f"{self.style}.json"
-                    if self.upload_file_ssh(style_file, style_filename, "styles"):
-                        logger.info(f"Uploaded style file {style_filename} to remote server")
-                    else:
-                        logger.warning(f"Failed to upload style file {style_filename} to remote server")
-                    
-                    logger.info(f"Updated style file {self.style} with playlist {self.playlist_name}")
-                    return True
+            existing_playlist_index = None
+            for i, p in enumerate(style_data["playlists"]):
+                if p["id"] == self.playlist_name:
+                    existing_playlist_index = i
+                    break
+            
+            if existing_playlist_index is not None:
+                # Update existing playlist entry
+                old_entry = style_data["playlists"][existing_playlist_index]
+                style_data["playlists"][existing_playlist_index] = playlist_entry
+                logger.info(f"Updated existing playlist {self.playlist_name} in style {self.style} "
+                           f"(tempo range: {old_entry.get('minTempo', 'unknown')}-{old_entry.get('maxTempo', 'unknown')} → "
+                           f"{playlist_entry['minTempo']}-{playlist_entry['maxTempo']} BPM)")
+            else:
+                # Add new playlist entry
+                style_data["playlists"].append(playlist_entry)
+                logger.info(f"Added new playlist {self.playlist_name} to style {self.style} "
+                           f"(tempo range: {playlist_entry['minTempo']}-{playlist_entry['maxTempo']} BPM)")
+            
+            # Save style file locally
+            os.makedirs(os.path.dirname(style_file), exist_ok=True)
+            with open(style_file, 'w') as f:
+                json.dump(style_data, f, indent=2)
+            
+            # Upload style file to remote server
+            style_filename = f"{self.style}.json"
+            if self.upload_file_ssh(style_file, style_filename, "styles"):
+                logger.info(f"Uploaded style file {style_filename} to remote server")
+            else:
+                logger.warning(f"Failed to upload style file {style_filename} to remote server")
             
             return True
             
@@ -823,7 +983,7 @@ class PlaylistGenerator:
                 except Exception as e:
                     logger.error(f"Error recalculating tempo for {playlist_file}: {e}")
     
-    def process_directory(self, input_dir: str, temp_dir: str = "./temp_audio") -> None:
+    def process_directory(self, input_dir: str, temp_dir: str) -> None:
         """Process all audio files in the input directory recursively."""
         input_path = Path(input_dir)
         temp_path = Path(temp_dir)
@@ -834,6 +994,10 @@ class PlaylistGenerator:
         
         logger.info(f"Processing directory: {input_dir}")
         
+        # Fetch list of remote audio files at the beginning to optimize processing
+        logger.info("Fetching remote audio files list for duplicate checking...")
+        self.fetch_remote_audio_files()
+        
         for file_path in input_path.rglob('*'):
             if file_path.suffix.lower() in audio_extensions:
                 self.process_audio_file(str(file_path), str(temp_path))
@@ -841,8 +1005,14 @@ class PlaylistGenerator:
         # Recalculate tempo ranges for all playlists after processing
         logger.info("Recalculating tempo ranges for all playlists...")
         self.recalculate_all_playlist_tempos()
+
+        logger.info("Updating styles...")
+        self.update_style_file()
         
         logger.info("Processing complete!")
+        
+        # Close SSH connection when done
+        self._close_ssh_connection()
     
     def process_audio_file(self, input_file: str, temp_dir: str) -> None:
         """Process a single audio file."""
@@ -851,6 +1021,55 @@ class PlaylistGenerator:
             
             # Extract metadata first
             metadata = self.extract_metadata(input_file)
+            
+            # Get or calculate AcoustID fingerprint early, before heavy processing
+            existing_fingerprint = metadata.get("acoustid_fingerprint")
+            fingerprint = None
+            
+            if existing_fingerprint:
+                fingerprint = existing_fingerprint
+                logger.info(f"Using existing AcoustID fingerprint for {input_file}")
+            else:
+                # Need to calculate fingerprint - do this early
+                logger.info(f"No existing AcoustID fingerprint found for {input_file}, calculating...")
+                fingerprint = self.get_acoustid_fingerprint(input_file, None, None)
+                if not fingerprint:
+                    logger.error(f"Failed to generate AcoustID fingerprint for {input_file}")
+                    return
+            
+            # Generate SHA1 hash of fingerprint to check remote existence
+            fingerprint_hash = self.get_sha1_hash(fingerprint)
+            remote_filename = f"{fingerprint_hash}.mp3"
+            
+            # Check if file with this AcoustID already exists on remote server
+            remote_audio_files = self.fetch_remote_audio_files()
+            if remote_filename in remote_audio_files:
+                logger.info(f"File with AcoustID {fingerprint_hash} already exists on server, skipping processing and upload")
+                
+                # Still add to playlist even if file exists on server
+                # But first validate basic metadata requirements
+                if not metadata.get("title") or not metadata.get("artist") or not metadata.get("album"):
+                    logger.warning(f"Skipping {input_file} - missing basic metadata (title, artist, or album)")
+                    self.skipped_files.append(input_file)
+                    return
+                
+                # Use existing remote file for playlist entry
+                base_url = self.config.get("urls", {}).get("base_url", f"https://{self.config['ssh']['hostname']}")
+                audio_path = self.config["ssh"].get("audio_path", "public/audio")
+                audio_url = f"{base_url.rstrip('/')}/{audio_path.strip('/')}/{remote_filename}"
+                
+                # Create playlist entry with minimal metadata
+                song_entry = self.create_playlist_entry(metadata, fingerprint_hash, audio_url)
+                
+                # Update playlist file
+                if self.update_playlist_file(song_entry):
+                    logger.info(f"Added existing file {input_file} to playlist")
+                
+                self.skipped_files.append(input_file)
+                return
+            
+            # File doesn't exist on server, proceed with full processing
+            logger.info(f"File {remote_filename} not found on server, proceeding with processing...")
             
             # Handle missing tempo
             if not metadata.get("tempo"):
@@ -895,15 +1114,9 @@ class PlaylistGenerator:
             else:
                 working_file = input_file
             
-            # Generate AcoustID fingerprint (use existing if available)
-            original_file_path = input_file if working_file != input_file else None
-            fingerprint = self.get_acoustid_fingerprint(working_file, metadata.get("acoustid_fingerprint"), original_file_path)
-            if not fingerprint:
-                return
-            
-            # Generate SHA1 hash of fingerprint
-            fingerprint_hash = self.get_sha1_hash(fingerprint)
-            remote_filename = f"{fingerprint_hash}.mp3"
+            # Save fingerprint to original file if it was calculated
+            if not existing_fingerprint:
+                self.save_acoustid_fingerprint_to_file(input_file, fingerprint)
             
             # Upload audio file to server
             if not self.upload_file_ssh(working_file, remote_filename, "audio"):
@@ -934,7 +1147,6 @@ class PlaylistGenerator:
             # Update playlist file
             if self.update_playlist_file(song_entry):
                 # Update style file
-                self.update_style_file()
                 self.processed_files.append({
                     "original_file": input_file,
                     "fingerprint_hash": fingerprint_hash,
@@ -991,7 +1203,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate playlists from music files")
     parser.add_argument("input_dir", nargs='?', help="Directory containing music files")
     parser.add_argument("--config", help="Configuration file path", default="config.json")
-    parser.add_argument("--temp-dir", help="Temporary directory for conversions", default="./temp_audio")
+    parser.add_argument("--temp-dir", help="Temporary directory for conversions", default="/tmp/playlist_gen")
     parser.add_argument("--style", help="Music style (e.g., bachata, salsa, west_coast_swing)")
     parser.add_argument("--playlist", help="Playlist name")
     parser.add_argument("--recalculate-tempos", action="store_true", help="Recalculate tempo ranges for all existing playlists without processing new files")
@@ -1019,7 +1231,7 @@ def main():
         if args.recalculate_tempos:
             # Only recalculate tempo ranges without processing new files
             logger.info("Recalculating tempo ranges for all existing playlists...")
-            dummy_generator = PlaylistGenerator(args.config, "dummy", "dummy", allow_dummy=True)
+            dummy_generator = PlaylistGenerator(args.config, "dummy", "dummy", allow_dummy=True, temp_dir=args.temp_dir)
             dummy_generator.recalculate_all_playlist_tempos()
             logger.info("Tempo recalculation complete!")
             return
