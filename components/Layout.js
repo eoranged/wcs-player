@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import TopPanel from './TopPanel';
 import { useTempoSlider } from '../hooks/useTempoSlider';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
+import { useMediaSession } from '../hooks/useMediaSession';
 import Player from './Player';
 
 // Create context for global player state
@@ -44,6 +45,17 @@ const Layout = ({ children }) => {
   const currentSong = songs[currentSongIndex] || {};
   const hasActiveSong = songs.length > 0 && currentSong.title;
 
+  // Initialize Media Session API for system-level controls
+  const { isMediaSessionSupported } = useMediaSession({
+    currentSong,
+    isPlaying,
+    playNextSong,
+    playPreviousSong,
+    togglePlayPause,
+    currentTime,
+    duration,
+  });
+
   // Player context value
   const playerContextValue = {
     songs,
@@ -71,6 +83,7 @@ const Layout = ({ children }) => {
     setShowFullPlayer,
     tempoRange,
     setTempoRange,
+    isMediaSessionSupported,
   };
 
   return (

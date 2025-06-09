@@ -247,6 +247,10 @@ export const useAudioPlayer = (initialSongs = []) => {
         
         // Set preload to metadata to get duration info
         audioRef.current.preload = 'metadata';
+        
+        // Enable media session controls
+        audioRef.current.controls = false; // We handle controls ourselves
+        audioRef.current.setAttribute('data-media-session', 'true');
       }
     }
   }, [songs, audioRef, currentSong?.audio, isInitialized]);
@@ -296,6 +300,10 @@ export const useAudioPlayer = (initialSongs = []) => {
         
         // Set preload to metadata to get duration info
         audioRef.current.preload = 'metadata';
+        
+        // Enable media session controls
+        audioRef.current.controls = false; // We handle controls ourselves
+        audioRef.current.setAttribute('data-media-session', 'true');
       } else {
         console.error('No audio URL available for current song');
       }
@@ -311,6 +319,11 @@ export const useAudioPlayer = (initialSongs = []) => {
         audioRef.current.load();
         audioRef.current.volume = 0.7;
         audioRef.current.preload = 'metadata';
+        
+        // Enable media session controls
+        audioRef.current.controls = false; // We handle controls ourselves
+        audioRef.current.setAttribute('data-media-session', 'true');
+        
         setIsInitialized(true);
         console.log('Audio player initialized with first song');
       }
