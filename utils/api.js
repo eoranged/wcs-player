@@ -77,13 +77,19 @@ export const fetchMusicLibrary = async (playlistId = 'wcs_beginner') => {
       console.log('First song:', data.songs[0]);
     }
     
-    // Process audio URLs to use base URL if configured
+    // Process audio URLs and cover images to use base URL if configured
     const baseUrl = getBaseUrl();
     if (baseUrl) {
-      data.songs = data.songs.map(song => ({
-        ...song,
-        audio: song.audio.startsWith('http') ? song.audio : `${baseUrl.replace(/\/$/, '')}${song.audio}`
-      }));
+      data.songs = data.songs.map(song => {
+        // Generate cover URL from song ID (fingerprint hash) if not already present
+        const coverUrl = song.id ? `${baseUrl.replace(/\/$/, '')}/audio/${song.id}.jpg` : null;
+        
+        return {
+          ...song,
+          audio: song.audio.startsWith('http') ? song.audio : `${baseUrl.replace(/\/$/, '')}${song.audio}`,
+          cover: song.cover || coverUrl
+        };
+      });
     }
     
     return data.songs;

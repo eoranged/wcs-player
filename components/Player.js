@@ -18,12 +18,24 @@ export default function Player({
     <>
       {/* Album Art */}
       <div className="relative pt-[50%] mb-4 rounded-xl overflow-hidden bg-gray-700 flex-shrink-0 max-w-[250px] mx-auto w-full">
-        {currentSong.cover && (
-          <img 
-            src={currentSong.cover} 
+        {currentSong.cover ? (
+          <img
+            src={currentSong.cover}
             alt={`${currentSong.title} album art`}
             className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              // Hide image if it fails to load
+              e.target.style.display = 'none';
+            }}
           />
+        ) : (
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6"></path>
+              <path d="m21 12-6-3-6 3-6-3"></path>
+            </svg>
+          </div>
         )}
       </div>
 
@@ -45,15 +57,27 @@ export default function Player({
                 <p className="text-blue-400 text-xs">{selectedPlaylist.name}</p>
               </div>
             )}
-            {tempoRange && (
-              <div className="flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 mr-1">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <p className="text-green-400 text-xs">{tempoRange.min}-{tempoRange.max} BPM</p>
-              </div>
-            )}
+            <div className="flex items-center justify-center space-x-4">
+              {currentSong.tempo && (
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 mr-1">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <p className="text-green-400 text-xs font-semibold">{currentSong.tempo} BPM</p>
+                </div>
+              )}
+              {tempoRange && (
+                <div className="flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 mr-1">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                  </svg>
+                  <p className="text-gray-500 text-xs">Range: {tempoRange.min}-{tempoRange.max}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

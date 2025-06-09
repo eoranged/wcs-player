@@ -43,10 +43,15 @@ export default async function handler(req, res) {
         if (playlistData.songs && Array.isArray(playlistData.songs)) {
           // Process each song and add to music library
           playlistData.songs.forEach(song => {
+            // Generate cover URL from song ID (fingerprint hash)
+            const coverUrl = song.id ? processAudioUrl(`/audio/${song.id}.jpg`) : null;
+            
             musicLibrary.push({
               ...song,
               // Process audio URL to use base URL if configured
               audio: processAudioUrl(song.audio),
+              // Add cover image URL if not already present
+              cover: song.cover || coverUrl,
               // Add playlist context
               playlist: playlistData.name,
               style: playlistData.style
