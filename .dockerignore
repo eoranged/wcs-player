@@ -53,7 +53,7 @@ pids
 .vercel
 
 # Scripts and development tools
-scripts
+#scripts
 
 # Docker
 Dockerfile
