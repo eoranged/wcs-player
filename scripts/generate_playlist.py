@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, cast
 import time
 import io
+import random
 
 # External dependencies
 try:
@@ -41,8 +42,10 @@ except ImportError as e:
 # Import optional dependencies with graceful fallbacks
 PIL_AVAILABLE = False
 Image = None
+ImageDraw = None
+ImageFont = None
 try:
-    from PIL import Image  # type: ignore
+    from PIL import Image, ImageDraw, ImageFont  # type: ignore
     PIL_AVAILABLE = True
 except ImportError:
     print("Warning: PIL/Pillow not available. Cover art extraction will be disabled.")
@@ -82,13 +85,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class PlaylistGenerator:
-    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False, skip_no_tempo: bool = False, temp_dir: str = "./temp_audio"):
+    def __init__(self, config_path: Optional[str] = None, style: Optional[str] = None, playlist_name: Optional[str] = None, allow_dummy: bool = False, skip_no_tempo: bool = False, temp_dir: str = "./temp_audio", cover_image: Optional[str] = None):
         """Initialize the playlist generator with configuration."""
         self.config = self._load_config(config_path)
         self.style = style
         self.playlist_name = playlist_name
         self.skip_no_tempo = skip_no_tempo
         self.temp_dir = temp_dir
+        self.cover_image = cover_image
         self.processed_files = []
         self.skipped_files = []
         self.errors = []
@@ -97,6 +101,7 @@ class PlaylistGenerator:
         self.ssh_client = None
         self.sftp_client = None
         self.remote_audio_files = None  # Cache for remote audio files list
+        self.album_covers = {}  # Store cover data by album for playlist cover generation
         
         # Create and ensure temp directory exists
         Path(self.temp_dir).mkdir(exist_ok=True)
@@ -316,7 +321,7 @@ class PlaylistGenerator:
                 fingerprint_str = fingerprint.decode('utf-8')
                 # Save the fingerprint to the original file (not the converted MP3)
                 target_file = original_file_path if original_file_path else file_path
-                self.save_acoustid_fingerprint_to_file(target_file, fingerprint_str)
+                self.save_acoustid_fingerprint_to_file(file_path, fingerprint_str)
                 return fingerprint_str
         except Exception as e:
             logger.error(f"Error generating fingerprint for {file_path}: {e}")
@@ -423,7 +428,7 @@ class PlaylistGenerator:
                         break
                 
                 # AcoustID fingerprint
-                for key in ['TXXX:ACOUSTID_FINGERPRINT', 'ACOUSTID_FINGERPRINT', 'acoustid_fingerprint']:
+                for key in ['TXXX:ACOUSTID_FINGERPRINT', 'ACOUSTID_FINGERPRINT', 'acoustid_fingerprint', '----:com.apple.iTunes:Acoustid Fingerprint']:
                     if key in tags:
                         metadata["acoustid_fingerprint"] = str(tags[key][0]) if isinstance(tags[key], list) else str(tags[key])
                         break
@@ -596,6 +601,280 @@ class PlaylistGenerator:
         except Exception as e:
             logger.error(f"Error saving cover image {cover_filename}: {e}")
             return None
+
+    def create_placeholder_image(self, size: Tuple[int, int] = (512, 512)) -> Optional[bytes]:
+        """Create a placeholder image for playlists without cover art."""
+        if not PIL_AVAILABLE or Image is None:
+            logger.warning("PIL/Pillow not available, cannot create placeholder image")
+            return None
+            
+        try:
+            # Create a simple gradient placeholder
+            image = Image.new('RGB', size, color='#2c3e50')
+            
+            # Add some visual elements to make it look like a music placeholder
+            if ImageDraw is None:
+                # If ImageDraw is not available, just return the solid color image
+                img_byte_arr = io.BytesIO()
+                image.save(img_byte_arr, format='JPEG', quality=85)
+                return img_byte_arr.getvalue()
+            
+            draw = ImageDraw.Draw(image)
+            
+            # Draw a simple music note-like shape
+            center_x, center_y = size[0] // 2, size[1] // 2
+            
+            # Draw circles to represent a music note
+            draw.ellipse([center_x - 60, center_y - 40, center_x - 20, center_y], fill='#ecf0f1')
+            draw.ellipse([center_x + 20, center_y - 20, center_x + 60, center_y + 20], fill='#ecf0f1')
+            
+            # Draw a line connecting them
+            draw.line([center_x - 40, center_y - 20, center_x + 40, center_y], fill='#ecf0f1', width=8)
+            
+            # Convert to bytes
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='JPEG', quality=85)
+            return img_byte_arr.getvalue()
+            
+        except Exception as e:
+            logger.error(f"Error creating placeholder image: {e}")
+            return None
+
+    def create_collage_from_covers(self, cover_images: List[bytes], size: Tuple[int, int] = (512, 512)) -> Optional[bytes]:
+        """Create a 2x2 collage from cover images."""
+        if not PIL_AVAILABLE or Image is None:
+            logger.warning("PIL/Pillow not available, cannot create collage")
+            return None
+            
+        if len(cover_images) < 4:
+            logger.warning("Need at least 4 cover images to create collage")
+            return None
+            
+        try:
+            # Create new image for collage
+            collage = Image.new('RGB', size, color='#000000')
+            
+            # Calculate quadrant size
+            quad_width = size[0] // 2
+            quad_height = size[1] // 2
+            
+            # Process each cover image and place in quadrant
+            positions = [(0, 0), (quad_width, 0), (0, quad_height), (quad_width, quad_height)]
+            
+            for i, cover_data in enumerate(cover_images[:4]):
+                try:
+                    # Open and resize cover image
+                    cover_image = Image.open(io.BytesIO(cover_data))
+                    
+                    # Convert to RGB if necessary
+                    if cover_image.mode != 'RGB':
+                        cover_image = cover_image.convert('RGB')
+                    
+                    # Resize to quadrant size
+                    try:
+                        cover_image = cover_image.resize((quad_width, quad_height), Image.Resampling.LANCZOS)
+                    except AttributeError:
+                        if hasattr(Image, 'LANCZOS'):
+                            cover_image = cover_image.resize((quad_width, quad_height), Image.LANCZOS)  # type: ignore
+                        else:
+                            cover_image = cover_image.resize((quad_width, quad_height))
+                    
+                    # Paste into collage
+                    collage.paste(cover_image, positions[i])
+                    
+                except Exception as e:
+                    logger.warning(f"Error processing cover image {i} for collage: {e}")
+                    continue
+            
+            # Convert to bytes
+            img_byte_arr = io.BytesIO()
+            collage.save(img_byte_arr, format='JPEG', quality=85)
+            return img_byte_arr.getvalue()
+            
+        except Exception as e:
+            logger.error(f"Error creating collage: {e}")
+            return None
+
+    def generate_playlist_cover(self, songs: List[Dict]) -> Optional[str]:
+        """Generate playlist cover image based on songs and configuration."""
+        if not PIL_AVAILABLE or Image is None:
+            logger.warning("PIL/Pillow not available, cannot generate playlist cover")
+            return None
+            
+        try:
+            cover_filename = f"{self.playlist_name}_cover.jpg"
+            cover_path = os.path.join(self.temp_dir, cover_filename)
+            
+            # If user provided a cover image, use it
+            if self.cover_image and os.path.exists(self.cover_image):
+                logger.info(f"Using provided cover image: {self.cover_image}")
+                try:
+                    image = Image.open(self.cover_image)
+                    if image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    
+                    # Resize to standard size
+                    try:
+                        image = image.resize((512, 512), Image.Resampling.LANCZOS)
+                    except AttributeError:
+                        if hasattr(Image, 'LANCZOS'):
+                            image = image.resize((512, 512), Image.LANCZOS)  # type: ignore
+                        else:
+                            image = image.resize((512, 512))
+                    
+                    image.save(cover_path, 'JPEG', quality=85, optimize=True)
+                    self.cover_image = cover_path
+                    return cover_path
+                    
+                except Exception as e:
+                    logger.error(f"Error processing provided cover image: {e}")
+                    # Fall through to automatic generation
+            
+            # Use stored album covers from processing
+            albums_with_covers = self.album_covers
+            
+            # If we have 4 or more different albums with covers, create collage
+            if len(albums_with_covers) >= 4:
+                logger.info(f"Creating collage from {len(albums_with_covers)} album covers")
+                album_covers = list(albums_with_covers.values())
+                random.shuffle(album_covers)  # Randomize selection
+                
+                collage_data = self.create_collage_from_covers(album_covers[:4])
+                if collage_data:
+                    with open(cover_path, 'wb') as f:
+                        f.write(collage_data)
+                    return cover_path
+            
+            # If we have at least one album cover, use a random one
+            elif albums_with_covers:
+                logger.info("Using random album cover for playlist")
+                random_cover = random.choice(list(albums_with_covers.values()))
+                
+                try:
+                    image = Image.open(io.BytesIO(random_cover))
+                    if image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    
+                    try:
+                        image = image.resize((512, 512), Image.Resampling.LANCZOS)
+                    except AttributeError:
+                        if hasattr(Image, 'LANCZOS'):
+                            image = image.resize((512, 512), Image.LANCZOS)  # type: ignore
+                        else:
+                            image = image.resize((512, 512))
+                    
+                    image.save(cover_path, 'JPEG', quality=85, optimize=True)
+                    return cover_path
+                    
+                except Exception as e:
+                    logger.error(f"Error processing random album cover: {e}")
+            
+            # No suitable covers found, create placeholder
+            logger.info("No suitable cover images found, creating placeholder")
+            placeholder_data = self.create_placeholder_image()
+            if placeholder_data:
+                with open(cover_path, 'wb') as f:
+                    f.write(placeholder_data)
+                return cover_path
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error generating playlist cover: {e}")
+            return None
+
+    def generate_and_upload_playlist_cover(self) -> bool:
+        """Generate playlist cover and upload it, then update playlist and style JSON files."""
+        try:
+            # Load current playlist to get songs
+            playlist_file = os.path.join(self.config["output"]["playlists_dir"], f"{self.playlist_name}.json")
+            if not os.path.exists(playlist_file):
+                logger.warning(f"Playlist file {playlist_file} does not exist, cannot generate cover")
+                return False
+            
+            with open(playlist_file, 'r') as f:
+                playlist = json.load(f)
+            
+            songs = playlist.get("songs", [])
+            if not songs:
+                logger.warning("No songs in playlist, cannot generate cover")
+                return False
+            
+            # Generate playlist cover
+            cover_path = self.generate_playlist_cover(songs)
+            if not cover_path:
+                logger.warning("Failed to generate playlist cover")
+                return False
+            
+            # Upload playlist cover
+            cover_filename = f"{self.playlist_name}_cover.jpg"
+            if self.upload_file_ssh(cover_path, cover_filename, "playlists"):
+                # Create cover URL
+                base_url = self.config.get("urls", {}).get("base_url", f"https://{self.config['ssh']['hostname']}")
+                playlists_path = self.config["ssh"].get("playlists_path", "public/playlists")
+                cover_url = f"{base_url.rstrip('/')}/{playlists_path.strip('/')}/{cover_filename}"
+                
+                # Update playlist JSON with cover URL
+                playlist["cover"] = cover_url
+                with open(playlist_file, 'w') as f:
+                    json.dump(playlist, f, indent=2)
+                
+                # Re-upload updated playlist
+                playlist_filename = f"{self.playlist_name}.json"
+                if self.upload_file_ssh(playlist_file, playlist_filename, "playlists"):
+                    logger.info(f"Updated playlist {self.playlist_name} with cover image")
+                
+                # Update style file with cover URL
+                self.update_style_file_with_cover(cover_url)
+                
+                # Clean up temp cover file
+                os.remove(cover_path)
+                
+                logger.info(f"Successfully generated and uploaded playlist cover: {cover_url}")
+                return True
+            else:
+                logger.error("Failed to upload playlist cover")
+                os.remove(cover_path)  # Clean up temp file
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error generating and uploading playlist cover: {e}")
+            return False
+
+    def update_style_file_with_cover(self, cover_url: str) -> bool:
+        """Update style file to include cover URL for the playlist."""
+        try:
+            style_file = os.path.join(self.config["output"]["styles_dir"], f"{self.style}.json")
+            
+            if not os.path.exists(style_file):
+                logger.warning(f"Style file {style_file} does not exist, cannot update with cover")
+                return False
+            
+            with open(style_file, 'r') as f:
+                style_data = json.load(f)
+            
+            # Find and update the playlist entry
+            for playlist_entry in style_data.get("playlists", []):
+                if playlist_entry.get("id") == self.playlist_name:
+                    playlist_entry["cover"] = cover_url
+                    break
+            
+            # Save updated style file
+            with open(style_file, 'w') as f:
+                json.dump(style_data, f, indent=2)
+            
+            # Upload updated style file
+            style_filename = f"{self.style}.json"
+            if self.upload_file_ssh(style_file, style_filename, "styles"):
+                logger.info(f"Updated style file {self.style} with playlist cover")
+                return True
+            else:
+                logger.warning(f"Failed to upload updated style file {self.style}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error updating style file with cover: {e}")
+            return False
     
     def calculate_tempo_range_from_songs(self, songs: List[Dict]) -> Tuple[int, int]:
         """Calculate tempo range from minimal to maximal tempo for all songs in playlist."""
@@ -842,6 +1121,7 @@ class PlaylistGenerator:
                     "id": self.playlist_name,
                     "name": self.playlist_name.replace("_", " ").title(),
                     "style": self.style.replace("_", " ").title(),
+                    "cover": self.cover_image,
                     "songs": []
                 }
             
@@ -907,6 +1187,7 @@ class PlaylistGenerator:
             playlist_entry = {
                 "id": self.playlist_name,
                 "name": playlist["name"],
+                "cover": playlist.get("cover"),
                 "minTempo": playlist["minTempo"],
                 "maxTempo": playlist["maxTempo"],
                 "description": playlist.get("description", f"Auto-generated playlist for {playlist['name']}")
@@ -1005,6 +1286,10 @@ class PlaylistGenerator:
         # Recalculate tempo ranges for all playlists after processing
         logger.info("Recalculating tempo ranges for all playlists...")
         self.recalculate_all_playlist_tempos()
+
+        # Generate and upload playlist cover image
+        logger.info("Generating playlist cover image...")
+        self.generate_and_upload_playlist_cover()
 
         logger.info("Updating styles...")
         self.update_style_file()
@@ -1125,6 +1410,11 @@ class PlaylistGenerator:
             # Handle cover image
             cover_url = None
             if metadata.get("cover_data"):
+                # Store cover data for playlist cover generation
+                album = metadata.get("album")
+                if album and album not in self.album_covers:
+                    self.album_covers[album] = metadata["cover_data"]
+                
                 cover_filename = f"{fingerprint_hash}.jpg"
                 cover_path = self.save_cover_image(metadata["cover_data"], cover_filename, temp_dir)
                 if cover_path:
@@ -1209,6 +1499,7 @@ def main():
     parser.add_argument("--recalculate-tempos", action="store_true", help="Recalculate tempo ranges for all existing playlists without processing new files")
     parser.add_argument("--skip-no-tempo", action="store_true", help="Skip songs that don't have tempo in metadata instead of measuring tempo")
     parser.add_argument("--upload-public", action="store_true", help="Upload all files from public directory to server")
+    parser.add_argument("--cover", help="Path to cover image file for playlist")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
     
     args = parser.parse_args()
@@ -1251,7 +1542,7 @@ def main():
             logger.error(f"Input directory does not exist: {args.input_dir}")
             sys.exit(1)
         
-        generator = PlaylistGenerator(args.config, args.style, args.playlist, skip_no_tempo=args.skip_no_tempo)
+        generator = PlaylistGenerator(args.config, args.style, args.playlist, skip_no_tempo=args.skip_no_tempo, cover_image=args.cover)
         generator.process_directory(args.input_dir, args.temp_dir)
         
         # Generate and print summary

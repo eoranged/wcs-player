@@ -7,6 +7,8 @@ This Python script processes music files from a directory, converts them to MP3 
 - **Audio Conversion**: Converts any audio format to MP3 using FFmpeg
 - **Audio Fingerprinting**: Generates AcoustID fingerprints for duplicate detection
 - **Metadata Extraction**: Extracts title, artist, album, tempo, and genre from audio files
+- **Cover Art Processing**: Extracts and processes album cover art from audio files
+- **Playlist Cover Generation**: Automatically generates playlist cover images using album art
 - **Smart Categorization**: Automatically categorizes music into dance styles (Bachata, Salsa, West Coast Swing)
 - **SSH Upload**: Uploads files to server without overwriting existing files
 - **Playlist Management**: Creates and updates JSON playlist files
@@ -108,6 +110,12 @@ python generate_playlist.py /path/to/music --verbose
 - `input_dir`: Directory containing music files (required)
 - `--config`: Path to configuration file (default: config.json)
 - `--temp-dir`: Temporary directory for file conversions (default: ./temp_audio)
+- `--style`: Music style (e.g., bachata, salsa, west_coast_swing)
+- `--playlist`: Playlist name
+- `--cover`: Path to cover image file for playlist
+- `--skip-no-tempo`: Skip songs that don't have tempo in metadata instead of measuring tempo
+- `--recalculate-tempos`: Recalculate tempo ranges for all existing playlists without processing new files
+- `--upload-public`: Upload all files from public directory to server
 - `--verbose`, `-v`: Enable verbose logging
 
 ## How It Works
@@ -156,6 +164,35 @@ The script automatically categorizes music into dance styles:
 - **Contemporary**: Modern WCS music
 - **Classics**: Classic WCS songs
 
+## Cover Image Generation
+
+The script automatically generates cover images for playlists using the following logic:
+
+### Cover Image Priority
+
+1. **User-provided cover**: If `--cover` option is used with a valid image file
+2. **Album art collage**: If 4+ different albums with cover art are found, creates a 2x2 collage
+3. **Random album cover**: If fewer than 4 albums but at least 1 has cover art, uses a random one
+4. **Placeholder image**: If no suitable cover art is found, generates a music note placeholder
+
+### Usage Examples
+
+```bash
+# Use a specific cover image
+python generate_playlist.py /path/to/music --style bachata --playlist moderna --cover /path/to/cover.jpg
+
+# Let the script auto-generate from album art
+python generate_playlist.py /path/to/music --style salsa --playlist cubana
+```
+
+### Cover Image Features
+
+- **Automatic extraction**: Extracts cover art from MP3, M4A, FLAC, and other formats
+- **Smart collaging**: Creates 2x2 collages from different album covers
+- **Consistent sizing**: All covers are resized to 512x512 pixels
+- **Format optimization**: Saves as JPEG with 85% quality for optimal file size
+- **Placeholder generation**: Creates attractive music note placeholders when needed
+
 ## File Structure
 
 The script creates/updates files in the following structure:
@@ -191,6 +228,7 @@ Each playlist file contains:
   "id": "playlist_id",
   "name": "Playlist Name",
   "style": "Dance Style",
+  "cover": "https://your-server.com/playlists/playlist_id_cover.jpg",
   "minTempo": 80,
   "maxTempo": 140,
   "songs": [
@@ -201,8 +239,28 @@ Each playlist file contains:
       "album": "Album Name",
       "tempo": 120,
       "duration": 240,
-      "cover": "https://placehold.co/512x512?text=Song+Title",
+      "cover": "https://your-server.com/audio/sha1_hash.jpg",
       "audio": "https://your-server.com/audio/sha1_hash.mp3"
+    }
+  ]
+}
+```
+
+### Style File Format
+
+Each style file contains:
+
+```json
+{
+  "style": "Dance Style",
+  "playlists": [
+    {
+      "id": "playlist_id",
+      "name": "Playlist Name",
+      "cover": "https://your-server.com/playlists/playlist_id_cover.jpg",
+      "minTempo": 80,
+      "maxTempo": 140,
+      "description": "Auto-generated playlist for Playlist Name"
     }
   ]
 }
